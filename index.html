@@ -1,0 +1,1798 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+
+  <!-- 手機版設定 -->
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
+  <meta name="theme-color" content="#f5f7fb">
+
+  <title>餘額記帳</title>
+
+  <style>
+    /* =========================
+       基本設定
+    ========================= */
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #f5f7fb;
+      color: #1f2937;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "PingFang TC",
+        "Noto Sans TC",
+        sans-serif;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: auto;
+      padding: 16px 14px 40px;
+    }
+
+    h1 {
+      font-size: 27px;
+      margin: 4px 0;
+    }
+
+    h2 {
+      font-size: 19px;
+      margin: 0 0 14px;
+    }
+
+    .subtitle {
+      color: #6b7280;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    /* =========================
+       卡片
+    ========================= */
+
+    .card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+    }
+
+    /* =========================
+       餘額
+    ========================= */
+
+    .balance {
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    .positive {
+      color: #16a34a;
+    }
+
+    .negative {
+      color: #dc2626;
+    }
+
+    /* =========================
+       統計
+    ========================= */
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .stat {
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .stat small {
+      display: block;
+      color: #6b7280;
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    .stat strong {
+      font-size: 16px;
+    }
+
+    /* =========================
+       表單
+    ========================= */
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin: 10px 0 6px;
+    }
+
+    input,
+    select,
+    button {
+      width: 100%;
+      font: inherit;
+      border-radius: 10px;
+      padding: 11px 12px;
+    }
+
+    input,
+    select {
+      border: 1px solid #e5e7eb;
+      background: #ffffff;
+    }
+
+    button {
+      border: 0;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: #2563eb;
+      color: white;
+    }
+
+    .secondary {
+      background: #eef2ff;
+      color: #3730a3;
+    }
+
+    .danger {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    /* =========================
+       收入 / 支出按鈕
+    ========================= */
+
+    .type-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .type-button {
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+    .active-income {
+      background: #dcfce7;
+      color: #166534;
+      border: 2px solid #22c55e;
+    }
+
+    .active-expense {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 2px solid #ef4444;
+    }
+
+    /* =========================
+       提示文字
+    ========================= */
+
+    .hint {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 6px;
+    }
+
+    /* =========================
+       表格
+    ========================= */
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      min-width: 500px;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th,
+    td {
+      padding: 10px 7px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: right;
+    }
+
+    th:first-child,
+    td:first-child {
+      text-align: left;
+    }
+
+    th {
+      color: #6b7280;
+      font-weight: 600;
+    }
+
+    /* =========================
+       紀錄
+    ========================= */
+
+    .records {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .record {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 11px;
+    }
+
+    .record-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .record-main {
+      font-weight: 700;
+    }
+
+    .record-meta {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+    .record-amount {
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    /* =========================
+       操作按鈕
+    ========================= */
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .empty {
+      text-align: center;
+      color: #6b7280;
+      padding: 18px;
+    }
+
+    .footer {
+      text-align: center;
+      color: #6b7280;
+      font-size: 12px;
+      padding: 8px;
+    }
+
+    /* =========================
+       手機最佳化
+    ========================= */
+
+    @media (max-width: 480px) {
+
+      .summary {
+        grid-template-columns: 1fr;
+      }
+
+      .row {
+        grid-template-columns: 1fr;
+      }
+
+      .balance {
+        font-size: 32px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- =========================
+       標題
+  ========================= -->
+
+  <h1>💰 餘額記帳</h1>
+
+  <div class="subtitle">
+    收入與支出共用分類，清楚查看各分類餘額
+  </div>
+
+
+  <!-- =========================
+       目前總餘額
+  ========================= -->
+
+  <section class="card">
+
+    <h2>目前總餘額</h2>
+
+    <div
+      id="balance"
+      class="balance positive"
+    >
+      $0
+    </div>
+
+    <div class="summary">
+
+      <div class="stat">
+        <small>初始餘額</small>
+        <strong id="initialDisplay">
+          $0
+        </strong>
+      </div>
+
+      <div class="stat">
+        <small>總收入</small>
+        <strong
+          id="incomeDisplay"
+          class="positive"
+        >
+          $0
+        </strong>
+      </div>
+
+      <div class="stat">
+        <small>總支出</small>
+        <strong
+          id="expenseDisplay"
+          class="negative"
+        >
+          $0
+        </strong>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       初始餘額
+  ========================= -->
+
+  <section class="card">
+
+    <h2>⚙️ 初始餘額</h2>
+
+    <div class="row">
+
+      <div>
+
+        <label>
+          初始金額
+        </label>
+
+        <input
+          id="initialBalance"
+          type="number"
+          inputmode="decimal"
+          step="0.01"
+          placeholder="例如 10000"
+        >
+
+      </div>
+
+
+      <div>
+
+        <label>
+          起始日期
+        </label>
+
+        <input
+          id="initialDate"
+          type="date"
+        >
+
+      </div>
+
+    </div>
+
+    <button
+      class="primary"
+      onclick="saveInitial()"
+    >
+      儲存初始餘額
+    </button>
+
+  </section>
+
+
+  <!-- =========================
+       新增收入 / 支出
+  ========================= -->
+
+  <section class="card">
+
+    <h2>➕ 新增收入／支出</h2>
+
+    <label>
+      類型
+    </label>
+
+    <div class="type-buttons">
+
+      <button
+        id="incomeBtn"
+        class="type-button active-income"
+        onclick="setType('income')"
+      >
+        收入
+      </button>
+
+      <button
+        id="expenseBtn"
+        class="type-button"
+        onclick="setType('expense')"
+      >
+        支出
+      </button>
+
+    </div>
+
+
+    <div class="row">
+
+      <div>
+
+        <label>
+          日期
+        </label>
+
+        <input
+          id="date"
+          type="date"
+        >
+
+      </div>
+
+
+      <div>
+
+        <label>
+          分類（收入／支出共用）
+        </label>
+
+        <select id="category">
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <label>
+      金額
+    </label>
+
+    <input
+      id="amount"
+      type="number"
+      inputmode="decimal"
+      min="0"
+      step="0.01"
+      placeholder="輸入金額"
+    >
+
+
+    <label>
+      備註
+    </label>
+
+    <input
+      id="note"
+      type="text"
+      maxlength="100"
+      placeholder="例如：晚餐、薪水、交通費"
+    >
+
+
+    <button
+      class="primary"
+      style="margin-top:12px"
+      onclick="addRecord()"
+    >
+      新增紀錄
+    </button>
+
+    <div class="hint">
+      同一分類可以同時記錄收入與支出。
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       分類餘額
+  ========================= -->
+
+  <section class="card">
+
+    <h2>📊 分類餘額</h2>
+
+    <div
+      class="hint"
+      style="margin-bottom:10px"
+    >
+      分類餘額 = 分類收入 − 分類支出
+    </div>
+
+    <div class="table-wrapper">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              分類
+            </th>
+
+            <th>
+              收入
+            </th>
+
+            <th>
+              支出
+            </th>
+
+            <th>
+              餘額
+            </th>
+
+          </tr>
+
+        </thead>
+
+        <tbody id="categoryStats">
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       月份統計
+  ========================= -->
+
+  <section class="card">
+
+    <h2>📅 月份統計</h2>
+
+    <div class="row">
+
+      <div>
+
+        <label>
+          月份
+        </label>
+
+        <select
+          id="monthFilter"
+          onchange="render()"
+        >
+        </select>
+
+      </div>
+
+
+      <div>
+
+        <label>
+          類型
+        </label>
+
+        <select
+          id="typeFilter"
+          onchange="render()"
+        >
+
+          <option value="all">
+            全部
+          </option>
+
+          <option value="income">
+            收入
+          </option>
+
+          <option value="expense">
+            支出
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <div
+      class="summary"
+      style="margin-top:12px"
+    >
+
+      <div class="stat">
+
+        <small>
+          月份收入
+        </small>
+
+        <strong
+          id="monthIncome"
+          class="positive"
+        >
+          $0
+        </strong>
+
+      </div>
+
+
+      <div class="stat">
+
+        <small>
+          月份支出
+        </small>
+
+        <strong
+          id="monthExpense"
+          class="negative"
+        >
+          $0
+        </strong>
+
+      </div>
+
+
+      <div class="stat">
+
+        <small>
+          月份淨額
+        </small>
+
+        <strong id="monthNet">
+          $0
+        </strong>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       紀錄
+  ========================= -->
+
+  <section class="card">
+
+    <h2>🧾 紀錄</h2>
+
+    <div
+      id="records"
+      class="records"
+    >
+    </div>
+
+
+    <div class="actions">
+
+      <button
+        class="secondary"
+        onclick="exportData()"
+      >
+        匯出資料
+      </button>
+
+      <button
+        class="danger"
+        onclick="clearAll()"
+      >
+        清除全部
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <div class="footer">
+    資料會儲存在目前瀏覽器中，建議定期匯出備份。
+  </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   資料設定
+========================================================= */
+
+const STORAGE_KEY =
+  "balance_book_shared_category_v1";
+
+
+/*
+  收入與支出共用這一套分類
+
+  例如：
+  餐飲可以有收入
+  餐飲也可以有支出
+
+  最後會計算：
+
+  餐飲收入 - 餐飲支出
+  = 餐飲餘額
+*/
+
+const categories = [
+  "餐飲",
+  "交通",
+  "娛樂",
+  "購物",
+  "日用品",
+  "住房",
+  "醫療",
+  "薪資",
+  "獎金",
+  "兼職",
+  "投資",
+  "其他"
+];
+
+
+/* =========================================================
+   預設資料
+========================================================= */
+
+let data = {
+
+  initialBalance: 0,
+
+  initialDate: "",
+
+  records: []
+
+};
+
+
+/* 目前選擇：收入 */
+
+let currentType = "income";
+
+
+/* =========================================================
+   工具函式
+========================================================= */
+
+function $(id) {
+
+  return document.getElementById(id);
+
+}
+
+
+/*
+  金額格式
+*/
+
+function formatMoney(number) {
+
+  return "$" +
+    Number(number || 0).toLocaleString(
+      "zh-TW",
+      {
+        maximumFractionDigits: 2
+      }
+    );
+
+}
+
+
+/*
+  HTML 安全處理
+*/
+
+function escapeHtml(text) {
+
+  return String(text ?? "")
+    .replace(/[&<>"']/g, function(match) {
+
+      return {
+
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+
+      }[match];
+
+    });
+
+}
+
+
+/*
+  今天日期
+*/
+
+function getToday() {
+
+  return new Date()
+    .toISOString()
+    .slice(0, 10);
+
+}
+
+
+/* =========================================================
+   儲存資料
+========================================================= */
+
+function saveData() {
+
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(data)
+  );
+
+}
+
+
+/* =========================================================
+   讀取資料
+========================================================= */
+
+function loadData() {
+
+  try {
+
+    const saved =
+      JSON.parse(
+        localStorage.getItem(STORAGE_KEY)
+      );
+
+    if (saved) {
+
+      data = {
+        ...data,
+        ...saved
+      };
+
+      if (!Array.isArray(data.records)) {
+
+        data.records = [];
+
+      }
+
+    }
+
+  } catch (error) {
+
+    console.log("讀取資料失敗");
+
+  }
+
+}
+
+
+/* =========================================================
+   收入 / 支出切換
+========================================================= */
+
+function setType(type) {
+
+  currentType = type;
+
+
+  if (type === "income") {
+
+    $("incomeBtn").className =
+      "type-button active-income";
+
+    $("expenseBtn").className =
+      "type-button";
+
+  } else {
+
+    $("incomeBtn").className =
+      "type-button";
+
+    $("expenseBtn").className =
+      "type-button active-expense";
+
+  }
+
+}
+
+
+/* =========================================================
+   建立分類選單
+========================================================= */
+
+function loadCategories() {
+
+  $("category").innerHTML =
+    categories
+      .map(function(category) {
+
+        return `
+          <option value="${escapeHtml(category)}">
+            ${escapeHtml(category)}
+          </option>
+        `;
+
+      })
+      .join("");
+
+}
+
+
+/* =========================================================
+   儲存初始餘額
+========================================================= */
+
+function saveInitial() {
+
+  const amount =
+    Number(
+      $("initialBalance").value
+    );
+
+
+  data.initialBalance =
+    Number.isFinite(amount)
+      ? amount
+      : 0;
+
+
+  data.initialDate =
+    $("initialDate").value ||
+    getToday();
+
+
+  saveData();
+
+  render();
+
+  alert("初始餘額已儲存");
+
+}
+
+
+/* =========================================================
+   新增紀錄
+========================================================= */
+
+function addRecord() {
+
+  const amount =
+    Number(
+      $("amount").value
+    );
+
+
+  if (
+    !Number.isFinite(amount) ||
+    amount <= 0
+  ) {
+
+    alert("請輸入大於 0 的金額");
+
+    return;
+
+  }
+
+
+  const record = {
+
+    id:
+      Date.now().toString(36) +
+      Math.random()
+        .toString(36)
+        .slice(2),
+
+    date:
+      $("date").value ||
+      getToday(),
+
+    type:
+      currentType,
+
+    category:
+      $("category").value,
+
+    amount:
+      amount,
+
+    note:
+      $("note").value.trim()
+
+  };
+
+
+  data.records.push(record);
+
+
+  saveData();
+
+
+  /* 清空輸入 */
+
+  $("amount").value = "";
+
+  $("note").value = "";
+
+
+  render();
+
+}
+
+
+/* =========================================================
+   刪除單筆紀錄
+========================================================= */
+
+function deleteRecord(id) {
+
+  if (
+    !confirm(
+      "確定要刪除這筆紀錄嗎？"
+    )
+  ) {
+
+    return;
+
+  }
+
+
+  data.records =
+    data.records.filter(
+      function(record) {
+
+        return record.id !== id;
+
+      }
+    );
+
+
+  saveData();
+
+  render();
+
+}
+
+
+/* =========================================================
+   清除全部資料
+========================================================= */
+
+function clearAll() {
+
+  if (
+    !confirm(
+      "確定要清除全部交易紀錄與初始餘額嗎？"
+    )
+  ) {
+
+    return;
+
+  }
+
+
+  data = {
+
+    initialBalance: 0,
+
+    initialDate: getToday(),
+
+    records: []
+
+  };
+
+
+  saveData();
+
+  render();
+
+}
+
+
+/* =========================================================
+   取得所有月份
+========================================================= */
+
+function getMonths() {
+
+  const months =
+    [
+      ...new Set(
+        data.records.map(
+          function(record) {
+
+            return record.date.slice(0, 7);
+
+          }
+        )
+      )
+    ];
+
+
+  const currentMonth =
+    getToday().slice(0, 7);
+
+
+  if (
+    !months.includes(currentMonth)
+  ) {
+
+    months.push(currentMonth);
+
+  }
+
+
+  return months.sort().reverse();
+
+}
+
+
+/* =========================================================
+   建立月份選單
+========================================================= */
+
+function fillMonthFilter() {
+
+  const select =
+    $("monthFilter");
+
+
+  const oldValue =
+    select.value;
+
+
+  select.innerHTML =
+    `
+      <option value="all">
+        全部月份
+      </option>
+    ` +
+
+    getMonths()
+      .map(function(month) {
+
+        return `
+          <option value="${month}">
+            ${month.replace("-", " 年 ")} 月
+          </option>
+        `;
+
+      })
+      .join("");
+
+
+  const exists =
+    [...select.options]
+      .some(
+        option =>
+          option.value === oldValue
+      );
+
+
+  if (exists) {
+
+    select.value = oldValue;
+
+  }
+
+}
+
+
+/* =========================================================
+   取得目前篩選後的紀錄
+========================================================= */
+
+function getFilteredRecords() {
+
+  const month =
+    $("monthFilter").value;
+
+
+  const type =
+    $("typeFilter").value;
+
+
+  return data.records.filter(
+    function(record) {
+
+      const monthOK =
+        month === "all" ||
+        record.date.startsWith(month);
+
+
+      const typeOK =
+        type === "all" ||
+        record.type === type;
+
+
+      return monthOK && typeOK;
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   分類統計
+========================================================= */
+
+function renderCategoryStats() {
+
+  const categoryData = {};
+
+
+  /*
+    先建立所有分類
+  */
+
+  categories.forEach(
+    function(category) {
+
+      categoryData[category] = {
+
+        income: 0,
+
+        expense: 0
+
+      };
+
+    }
+  );
+
+
+  /*
+    把每一筆收入／支出
+    放到同一分類
+  */
+
+  data.records.forEach(
+    function(record) {
+
+      if (!categoryData[record.category]) {
+
+        categoryData[record.category] = {
+
+          income: 0,
+
+          expense: 0
+
+        };
+
+      }
+
+
+      if (record.type === "income") {
+
+        categoryData[
+          record.category
+        ].income += record.amount;
+
+      } else {
+
+        categoryData[
+          record.category
+        ].expense += record.amount;
+
+      }
+
+    }
+  );
+
+
+  /*
+    顯示分類統計
+  */
+
+  $("categoryStats").innerHTML =
+    categories
+      .map(function(category) {
+
+        const item =
+          categoryData[category];
+
+
+        /*
+          分類餘額
+          = 收入 - 支出
+        */
+
+        const balance =
+          item.income -
+          item.expense;
+
+
+        return `
+
+          <tr>
+
+            <td>
+              ${escapeHtml(category)}
+            </td>
+
+            <td class="positive">
+              ${formatMoney(item.income)}
+            </td>
+
+            <td class="negative">
+              ${formatMoney(item.expense)}
+            </td>
+
+            <td
+              class="${
+                balance >= 0
+                  ? "positive"
+                  : "negative"
+              }"
+            >
+
+              ${
+                balance >= 0
+                  ? "+"
+                  : ""
+              }
+
+              ${formatMoney(balance)}
+
+            </td>
+
+          </tr>
+
+        `;
+
+      })
+      .join("");
+
+}
+
+
+/* =========================================================
+   月份統計
+========================================================= */
+
+function renderMonthStats() {
+
+  const records =
+    getFilteredRecords();
+
+
+  const income =
+    records
+      .filter(
+        record =>
+          record.type === "income"
+      )
+      .reduce(
+        (sum, record) =>
+          sum + record.amount,
+        0
+      );
+
+
+  const expense =
+    records
+      .filter(
+        record =>
+          record.type === "expense"
+      )
+      .reduce(
+        (sum, record) =>
+          sum + record.amount,
+        0
+      );
+
+
+  const net =
+    income - expense;
+
+
+  $("monthIncome").textContent =
+    formatMoney(income);
+
+
+  $("monthExpense").textContent =
+    formatMoney(expense);
+
+
+  $("monthNet").textContent =
+    (net >= 0 ? "+" : "") +
+    formatMoney(net);
+
+
+  $("monthNet").className =
+    net >= 0
+      ? "positive"
+      : "negative";
+
+}
+
+
+/* =========================================================
+   顯示紀錄
+========================================================= */
+
+function renderRecords() {
+
+  const records =
+    [...getFilteredRecords()]
+      .sort(
+        function(a, b) {
+
+          return b.date.localeCompare(
+            a.date
+          );
+
+        }
+      );
+
+
+  if (records.length === 0) {
+
+    $("records").innerHTML = `
+      <div class="empty">
+        目前沒有符合條件的紀錄
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  $("records").innerHTML =
+    records
+      .map(function(record) {
+
+        const isIncome =
+          record.type === "income";
+
+
+        return `
+
+          <div class="record">
+
+            <div class="record-top">
+
+              <div>
+
+                <div class="record-main">
+
+                  ${
+                    isIncome
+                      ? "🟢"
+                      : "🔴"
+                  }
+
+                  ${escapeHtml(
+                    record.category
+                  )}
+
+                </div>
+
+
+                <div class="record-meta">
+
+                  ${escapeHtml(
+                    record.date
+                  )}
+
+                  ・
+
+                  ${
+                    isIncome
+                      ? "收入"
+                      : "支出"
+                  }
+
+                  ${
+                    record.note
+                      ? " ・ " +
+                        escapeHtml(
+                          record.note
+                        )
+                      : ""
+                  }
+
+                </div>
+
+              </div>
+
+
+              <div
+                class="record-amount ${
+                  isIncome
+                    ? "positive"
+                    : "negative"
+                }"
+              >
+
+                ${
+                  isIncome
+                    ? "+"
+                    : "-"
+                }
+
+                ${formatMoney(
+                  record.amount
+                )}
+
+              </div>
+
+            </div>
+
+
+            <button
+              class="danger"
+              style="margin-top:8px;padding:7px"
+              onclick="deleteRecord('${record.id}')"
+            >
+              刪除
+            </button>
+
+          </div>
+
+        `;
+
+      })
+      .join("");
+
+}
+
+
+/* =========================================================
+   主畫面更新
+========================================================= */
+
+function render() {
+
+  /*
+    初始餘額
+  */
+
+  $("initialBalance").value =
+    data.initialBalance;
+
+
+  $("initialDate").value =
+    data.initialDate;
+
+
+  /*
+    計算總收入
+  */
+
+  const totalIncome =
+    data.records
+      .filter(
+        record =>
+          record.type === "income"
+      )
+      .reduce(
+        (sum, record) =>
+          sum + record.amount,
+        0
+      );
+
+
+  /*
+    計算總支出
+  */
+
+  const totalExpense =
+    data.records
+      .filter(
+        record =>
+          record.type === "expense"
+      )
+      .reduce(
+        (sum, record) =>
+          sum + record.amount,
+        0
+      );
+
+
+  /*
+    計算目前總餘額
+
+    初始餘額
+    +
+    總收入
+    -
+    總支出
+  */
+
+  const balance =
+    data.initialBalance +
+    totalIncome -
+    totalExpense;
+
+
+  $("balance").textContent =
+    formatMoney(balance);
+
+
+  $("balance").className =
+    "balance " +
+    (
+      balance < 0
+        ? "negative"
+        : "positive"
+    );
+
+
+  $("initialDisplay").textContent =
+    formatMoney(
+      data.initialBalance
+    );
+
+
+  $("incomeDisplay").textContent =
+    formatMoney(
+      totalIncome
+    );
+
+
+  $("expenseDisplay").textContent =
+    formatMoney(
+      totalExpense
+    );
+
+
+  /*
+    更新月份
+  */
+
+  fillMonthFilter();
+
+
+  /*
+    更新分類統計
+  */
+
+  renderCategoryStats();
+
+
+  /*
+    更新月份統計
+  */
+
+  renderMonthStats();
+
+
+  /*
+    更新紀錄
+  */
+
+  renderRecords();
+
+}
+
+
+/* =========================================================
+   匯出資料
+========================================================= */
+
+function exportData() {
+
+  const blob =
+    new Blob(
+      [
+        JSON.stringify(
+          data,
+          null,
+          2
+        )
+      ],
+      {
+        type: "application/json"
+      }
+    );
+
+
+  const url =
+    URL.createObjectURL(blob);
+
+
+  const link =
+    document.createElement("a");
+
+
+  link.href = url;
+
+  link.download =
+    "餘額記帳備份.json";
+
+
+  link.click();
+
+
+  URL.revokeObjectURL(url);
+
+}
+
+
+/* =========================================================
+   啟動程式
+========================================================= */
+
+loadData();
+
+loadCategories();
+
+
+/*
+  預設日期
+*/
+
+$("date").value =
+  getToday();
+
+
+$("initialDate").value =
+  data.initialDate ||
+  getToday();
+
+
+/*
+  顯示畫面
+*/
+
+render();
+
+</script>
+
+</body>
+</html>
