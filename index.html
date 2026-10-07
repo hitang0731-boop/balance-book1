@@ -32,6 +32,7 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 .calendarhead,.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.calendarhead{text-align:center;color:var(--muted);font-size:12px;margin-bottom:4px}.day{min-height:65px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:5px;text-align:left}.day.today{outline:2px solid #8fb2ff}.daynum{font-weight:900}.dm{font-size:10px;margin-top:3px}
 .monthgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.monthbox{border:1px solid var(--line);border-radius:14px;padding:10px;background:#fbfcff;text-align:left}
 .filters{display:grid;grid-template-columns:1fr 1fr;gap:10px}.record{border:1px solid var(--line);border-radius:15px;padding:12px;margin:8px 0}.rtop{display:flex;justify-content:space-between;gap:8px}.rtitle{font-weight:900}.ramount{font-weight:900}.rmeta{font-size:13px;color:var(--muted)}.rnote{margin-top:5px;color:#4a5568}.actions{display:flex;gap:7px;margin-top:8px;flex-wrap:wrap}.empty{text-align:center;color:var(--muted);padding:18px}
+.account-card{cursor:pointer;border:2px solid var(--line);border-radius:18px;padding:14px;background:#fbfcff;transition:.15s}.account-card:active{transform:scale(.98)}.account-card:hover{border-color:#9bb8f5}.account-name{font-size:19px;font-weight:900}.account-balance{font-size:28px;font-weight:900;margin:5px 0}.account-mini{font-size:13px;color:var(--muted)}
 .modalbg{position:fixed;inset:0;background:#0008;display:none;align-items:flex-end;padding:10px;z-index:20}.modalbg.show{display:flex}.modal{width:min(700px,100%);background:#fff;border-radius:24px;padding:18px;max-height:90vh;overflow:auto}.modalhead{display:flex;justify-content:space-between}.close{border:0;background:#f1f4f8;border-radius:50%;width:42px;height:42px;font-size:22px}
 .toast{position:fixed;left:50%;bottom:25px;transform:translateX(-50%);background:#172033;color:#fff;padding:12px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:.2s;z-index:50}.toast.show{opacity:1}
 @media(max-width:650px){.wrap{padding:12px 10px 55px}.form,.filters{grid-template-columns:1fr}.grid3{grid-template-columns:1fr}.monthgrid{grid-template-columns:1fr 1fr}.card{padding:16px}.big{font-size:39px}}
@@ -56,6 +57,21 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 <div style="display:flex;align-items:end"><button type="button" class="btn primary full" id="addAccountBtn">＋ 新增帳戶</button></div>
 </div>
 <div id="accountManage" style="margin-top:12px"></div>
+</section>
+
+<section class="card" id="accountDetail" style="display:none">
+<div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+<h2 id="detailTitle" style="margin:0">🏦 帳戶明細</h2>
+<button type="button" class="btn" id="closeAccountDetail">← 回到帳戶總覽</button>
+</div>
+<div class="grid3" style="margin-top:12px">
+<div class="stat"><div class="label">目前餘額</div><div class="val" id="detailBalance">$0</div></div>
+<div class="stat"><div class="label">總收入</div><div class="val income" id="detailIncome">$0</div></div>
+<div class="stat"><div class="label">總支出</div><div class="val expense" id="detailExpense">$0</div></div>
+</div>
+<div class="grid2" style="margin-top:10px"><div class="stat"><div class="label">初始餘額</div><div class="val" id="detailInitial">$0</div></div><div class="stat"><div class="label">交易筆數</div><div class="val" id="detailCount">0</div></div></div>
+<h3 style="margin:18px 0 8px">📋 此帳戶交易紀錄</h3>
+<div id="detailRecords"></div>
 </section>
 
 <section class="card">
@@ -138,6 +154,7 @@ var currentMonth="";
 var currentType="income";
 var rankType="expense";
 var editingId=null;
+var currentAccountId=null;
 
 function $(id){return document.getElementById(id);}
 function pad(n){return n<10?"0"+n:String(n);}
@@ -213,9 +230,86 @@ function setType(type){
   $("status").textContent=income?"目前選擇：收入":"目前選擇：支出";
   $("addBtn").textContent=income?"＋ 新增收入":"＋ 新增支出";
 }
+function accountById(id){
+  for(var i=0;i<data.accounts.length;i++) if(String(data.accounts[i].id)===String(id)) return data.accounts[i];
+  return null;
+}
+function accountName(id){var a=accountById(id);return a?a.name:"未分類帳戶";}
+function accountRows(id){return data.records.filter(function(r){return String(r.accountId)===String(id);});}
+function accountBalance(id){
+  var a=accountById(id); if(!a)return 0;
+  var rows=accountRows(id);
+  return (Number(a.initialBalance)||0)+sum(rows,"income")-sum(rows,"expense");
+}
+function fillAccounts(){
+  var opts="";
+  for(var i=0;i<data.accounts.length;i++) opts+='<option value="'+escapeHtml(data.accounts[i].id)+'">'+escapeHtml(data.accounts[i].name)+'</option>';
+  ["accountSelect","initialAccount","editAccount"].forEach(function(id){if($(id))$(id).innerHTML=opts;});
+  var f='<option value="all">全部銀行帳戶</option>'+opts;
+  if($("accountFilter"))$("accountFilter").innerHTML=f;
+  if(currentAccountId && accountById(currentAccountId)){
+    $("accountSelect").value=currentAccountId;
+  }
+}
+function renderAccounts(){
+  var html="";
+  for(var i=0;i<data.accounts.length;i++){
+    var a=data.accounts[i],rows=accountRows(a.id),inc=sum(rows,"income"),exp=sum(rows,"expense");
+    html+='<button type="button" class="account-card" data-account-open="'+escapeHtml(a.id)+'">'
+      +'<div class="account-name">🏦 '+escapeHtml(a.name)+'</div>'
+      +'<div class="account-balance">'+money(accountBalance(a.id))+'</div>'
+      +'<div class="account-mini">收入 '+money(inc)+'　支出 '+money(exp)+'</div>'
+      +'</button>';
+  }
+  $("accountSummary").innerHTML=html;
+  var bs=$("accountSummary").querySelectorAll("[data-account-open]");
+  for(var j=0;j<bs.length;j++) bs[j].addEventListener("click",function(){openAccountDetail(this.getAttribute("data-account-open"));});
+}
+function addAccount(){
+  var name=$("newAccountName").value.trim();
+  if(!name){showToast("請輸入銀行帳戶名稱");return;}
+  for(var i=0;i<data.accounts.length;i++) if(data.accounts[i].name===name){showToast("這個帳戶已存在");return;}
+  var id="acc_"+Date.now()+"_"+Math.random().toString(36).slice(2);
+  data.accounts.push({id:id,name:name,initialBalance:0,initialDate:today()});
+  currentAccountId=id; safeSave(); $("newAccountName").value=""; fillAccounts(); $("accountSelect").value=id; $("initialAccount").value=id; $("initialAmount").value=0; $("initialDate").value=today(); render(); showToast("已新增「"+name+"」");
+}
+function openAccountDetail(id){
+  if(!accountById(id))return;
+  currentAccountId=id;
+  $("accountDetail").style.display="block";
+  fillAccounts();
+  $("accountSelect").value=id;
+  renderAccountDetail();
+  setTimeout(function(){ $("accountDetail").scrollIntoView({behavior:"smooth",block:"start"}); },20);
+}
+function closeAccountDetail(){currentAccountId=null;$("accountDetail").style.display="none";render();window.scrollTo({top:0,behavior:"smooth"});}
+function renderAccountDetail(){
+  if(!currentAccountId || !accountById(currentAccountId)){$("accountDetail").style.display="none";return;}
+  var a=accountById(currentAccountId),rows=accountRows(currentAccountId).slice().sort(function(x,y){return y.date.localeCompare(x.date)||String(y.id).localeCompare(String(x.id));});
+  $("detailTitle").textContent="🏦 "+a.name+"｜帳戶明細";
+  $("detailBalance").textContent=money(accountBalance(currentAccountId));
+  $("detailIncome").textContent=money(sum(rows,"income"));
+  $("detailExpense").textContent=money(sum(rows,"expense"));
+  $("detailInitial").textContent=money(a.initialBalance);
+  $("detailCount").textContent=String(rows.length);
+  var html="";
+  for(var i=0;i<rows.length;i++){
+    var r=rows[i];
+    html+='<div class="record"><div class="rtop"><div><div class="rtitle">'+(r.type==="income"?"💵":"💸")+' '+escapeHtml(r.category)+'</div><div class="rmeta">📅 '+escapeHtml(r.date)+'</div></div><div class="ramount '+r.type+'">'+(r.type==="income"?"+":"-")+money(r.amount)+'</div></div>';
+    if(r.note)html+='<div class="rnote">📝 '+escapeHtml(r.note)+'</div>';
+    html+='<div class="actions"><button type="button" class="btn" data-detail-edit="'+escapeHtml(r.id)+'">✏️ 編輯</button><button type="button" class="btn danger" data-detail-delete="'+escapeHtml(r.id)+'">🗑️ 刪除</button></div></div>';
+  }
+  $("detailRecords").innerHTML=html||'<div class="empty">這個帳戶目前沒有交易紀錄</div>';
+  var es=$("detailRecords").querySelectorAll("[data-detail-edit]");
+  for(var j=0;j<es.length;j++)es[j].addEventListener("click",function(){openEdit(this.getAttribute("data-detail-edit"));});
+  var ds=$("detailRecords").querySelectorAll("[data-detail-delete]");
+  for(var k=0;k<ds.length;k++)ds[k].addEventListener("click",function(){deleteRecord(this.getAttribute("data-detail-delete"));});
+}
+
 function render(){
   renderTop();
   renderAccounts();
+  renderAccountDetail();
   renderMonth();
   renderChart();
   renderRank();
@@ -397,7 +491,7 @@ function deleteRecord(id){
   safeSave();render();showToast("紀錄已刪除");
 }
 function downloadJSON(name){
-  var blob=new Blob([JSON.stringify({version:3,exportedAt:new Date().toISOString(),initialBalance:data.initialBalance,initialDate:data.initialDate,records:data.records},null,2)],{type:"application/json"});
+  var blob=new Blob([JSON.stringify({version:4,exportedAt:new Date().toISOString(),accounts:data.accounts,records:data.records},null,2)],{type:"application/json"});
   var url=URL.createObjectURL(blob),a=document.createElement("a");
   a.href=url;a.download=name;document.body.appendChild(a);a.click();document.body.removeChild(a);
   setTimeout(function(){URL.revokeObjectURL(url);},1000);
@@ -410,10 +504,16 @@ function restoreFile(file){
       var x=JSON.parse(reader.result);
       if(!x||!Array.isArray(x.records))throw new Error("bad");
       if(!window.confirm("還原會覆蓋目前資料，確定嗎？"))return;
-      data.initialBalance=Number(x.initialBalance)||0;data.initialDate=x.initialDate||today();
-      data.records=x.records.map(function(r){return {id:r.id||String(Date.now())+String(Math.random()),type:r.type==="expense"?"expense":"income",date:r.date||today(),category:r.category||"其他",amount:Math.abs(Number(r.amount)||0),note:r.note||""};});
-      safeSave();currentMonth=today().slice(0,7);render();showToast("資料已還原");
-    }catch(e){window.alert("無法還原：檔案不是有效的記帳 JSON 備份。");}
+      if(Array.isArray(x.accounts)&&x.accounts.length){
+        data.accounts=x.accounts.map(function(a){return {id:a.id||("acc_"+Date.now()+Math.random()),name:a.name||"銀行帳戶",initialBalance:Number(a.initialBalance)||0,initialDate:a.initialDate||today()};});
+      }else{
+        data.accounts=[{id:"acc_default",name:"未分類帳戶",initialBalance:Number(x.initialBalance)||0,initialDate:x.initialDate||today()}];
+      }
+      var first=data.accounts[0].id;
+      data.records=x.records.map(function(r){return {id:r.id||String(Date.now())+String(Math.random()),type:r.type==="expense"?"expense":"income",date:r.date||today(),category:r.category||"其他",amount:Math.abs(Number(r.amount)||0),note:r.note||"",accountId:r.accountId||first};});
+      for(var i=0;i<data.records.length;i++)if(!accountById(data.records[i].accountId))data.records[i].accountId=first;
+      safeSave();currentAccountId=null;fillAccounts();currentMonth=today().slice(0,7);render();showToast("資料已還原");
+    }catch(e){window.alert("無法還原：檔案不是有效的記帳備份。");}
   };
   reader.readAsText(file);
 }
@@ -428,6 +528,7 @@ function init(){
   fillCategories();
   fillAccounts();
   currentMonth=today().slice(0,7);
+  currentAccountId=null;
 
   $("date").value=today();
   $("accountSelect").value=data.accounts[0].id;
@@ -441,6 +542,7 @@ function init(){
   $("addBtn").addEventListener("click",addRecord);
   $("saveInitialBtn").addEventListener("click",saveInitial);
   $("addAccountBtn").addEventListener("click",addAccount);
+  $("closeAccountDetail").addEventListener("click",closeAccountDetail);
   $("initialAccount").addEventListener("change",function(){var a=accountById(this.value);if(a){$("initialAmount").value=a.initialBalance||0;$("initialDate").value=a.initialDate||today();}});
   $("prev").addEventListener("click",function(){moveMonth(-1);});
   $("next").addEventListener("click",function(){moveMonth(1);});
