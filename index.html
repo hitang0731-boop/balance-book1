@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f3f6fb">
-<title>💰 我的記帳</title>
+<title>💰 我的記帳｜銀行轉帳版</title>
 <style>
 :root{--bg:#f3f6fb;--card:#fff;--text:#172033;--muted:#718096;--line:#d7e0ec;--blue:#2563eb;--green:#198754;--red:#dc3545}
 *{box-sizing:border-box}
@@ -32,7 +32,7 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 .calendarhead,.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.calendarhead{text-align:center;color:var(--muted);font-size:12px;margin-bottom:4px}.day{min-height:65px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:5px;text-align:left}.day.today{outline:2px solid #8fb2ff}.daynum{font-weight:900}.dm{font-size:10px;margin-top:3px}
 .monthgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.monthbox{border:1px solid var(--line);border-radius:14px;padding:10px;background:#fbfcff;text-align:left}
 .filters{display:grid;grid-template-columns:1fr 1fr;gap:10px}.record{border:1px solid var(--line);border-radius:15px;padding:12px;margin:8px 0}.rtop{display:flex;justify-content:space-between;gap:8px}.rtitle{font-weight:900}.ramount{font-weight:900}.rmeta{font-size:13px;color:var(--muted)}.rnote{margin-top:5px;color:#4a5568}.actions{display:flex;gap:7px;margin-top:8px;flex-wrap:wrap}.empty{text-align:center;color:var(--muted);padding:18px}
-.account-card{cursor:pointer;border:2px solid var(--line);border-radius:18px;padding:14px;background:#fbfcff;transition:.15s}.account-card:active{transform:scale(.98)}.account-card:hover{border-color:#9bb8f5}.account-name{font-size:19px;font-weight:900}.account-balance{font-size:28px;font-weight:900;margin:5px 0}.account-mini{font-size:13px;color:var(--muted)}
+.transfer{color:#7c3aed}.transfer-bg{background:#f5f0ff;border-color:#c4b5fd}.transfer-arrow{font-size:24px;font-weight:900;color:#7c3aed}.account-card{cursor:pointer;border:2px solid var(--line);border-radius:18px;padding:14px;background:#fbfcff;transition:.15s}.account-card:active{transform:scale(.98)}.account-card:hover{border-color:#9bb8f5}.account-name{font-size:19px;font-weight:900}.account-balance{font-size:28px;font-weight:900;margin:5px 0}.account-mini{font-size:13px;color:var(--muted)}
 .modalbg{position:fixed;inset:0;background:#0008;display:none;align-items:flex-end;padding:10px;z-index:20}.modalbg.show{display:flex}.modal{width:min(700px,100%);background:#fff;border-radius:24px;padding:18px;max-height:90vh;overflow:auto}.modalhead{display:flex;justify-content:space-between}.close{border:0;background:#f1f4f8;border-radius:50%;width:42px;height:42px;font-size:22px}
 .toast{position:fixed;left:50%;bottom:25px;transform:translateX(-50%);background:#172033;color:#fff;padding:12px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:.2s;z-index:50}.toast.show{opacity:1}
 @media(max-width:650px){.wrap{padding:12px 10px 55px}.form,.filters{grid-template-columns:1fr}.grid3{grid-template-columns:1fr}.monthgrid{grid-template-columns:1fr 1fr}.card{padding:16px}.big{font-size:39px}}
@@ -96,6 +96,20 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 </section>
 
 <section class="card">
+<h2>🔄 帳戶轉帳</h2>
+<div class="label" style="margin-bottom:10px">把錢從一個帳戶轉到另一個帳戶。這不算收入或支出，只會讓兩邊餘額一增一減。</div>
+<div class="form">
+<div><label>轉出帳戶</label><select id="transferFrom"></select></div>
+<div><label>轉入帳戶</label><select id="transferTo"></select></div>
+<div><label>日期</label><input type="date" id="transferDate"></div>
+<div><label>金額</label><input type="number" id="transferAmount" min="0" step="0.01" placeholder="例如 10000" inputmode="decimal"></div>
+<div><label>備註</label><input id="transferNote" placeholder="例如 每月存款"></div>
+</div>
+<button type="button" class="btn primary full" id="transferBtn" style="margin-top:12px">🔄 確認轉帳</button>
+<div id="transferStatus" class="status transfer-bg transfer" style="margin-top:10px">轉帳會讓總資產保持不變</div>
+</section>
+
+<section class="card">
 <h2>⚙️ 初始餘額</h2>
 <div class="form">
 <div><label>銀行帳戶</label><select id="initialAccount"></select></div>
@@ -128,6 +142,18 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 </section>
 </div>
 
+<div id="transferModal" class="modalbg"><div class="modal">
+<div class="modalhead"><h2>✏️ 編輯轉帳</h2><button type="button" class="close" id="closeTransferModal">×</button></div>
+<div class="form">
+<div><label>轉出帳戶</label><select id="editTransferFrom"></select></div>
+<div><label>轉入帳戶</label><select id="editTransferTo"></select></div>
+<div><label>日期</label><input type="date" id="editTransferDate"></div>
+<div><label>金額</label><input type="number" id="editTransferAmount" min="0" step="0.01" inputmode="decimal"></div>
+<div style="grid-column:1/-1"><label>備註</label><input id="editTransferNote"></div>
+</div>
+<button type="button" class="btn primary full" id="updateTransferBtn" style="margin-top:12px">儲存轉帳修改</button>
+</div></div>
+
 <div id="modal" class="modalbg"><div class="modal">
 <div class="modalhead"><h2>✏️ 編輯紀錄</h2><button type="button" class="close" id="closeModal">×</button></div>
 <div class="form">
@@ -149,7 +175,7 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 var KEY="balance_book_shared_category_v1";
 var CATS=["餐飲","交通","娛樂","購物","日用品","住房","醫療","薪資","獎金","兼職","投資","其他"];
 var COLORS=["#2563eb","#ef4444","#10b981","#f59e0b","#8b5cf6","#ec4899","#14b8a6","#f97316","#06b6d4","#84cc16","#6366f1","#64748b"];
-var data={accounts:[],records:[]};
+var data={accounts:[],records:[],transfers:[]};
 var currentMonth="";
 var currentType="income";
 var rankType="expense";
@@ -208,9 +234,13 @@ function loadData(){
       data.records=Array.isArray(x.records)?x.records.map(function(r){
         return {id:r.id||String(Date.now())+String(Math.random()),type:r.type==="expense"?"expense":"income",date:r.date||today(),category:r.category||"其他",amount:Math.abs(Number(r.amount)||0),note:r.note||"",accountId:r.accountId||first};
       }):[];
+      data.transfers=Array.isArray(x.transfers)?x.transfers.map(function(t){
+        return {id:t.id||String(Date.now())+String(Math.random()),fromAccountId:t.fromAccountId||first,toAccountId:t.toAccountId||first,date:t.date||today(),amount:Math.abs(Number(t.amount)||0),note:t.note||""};
+      }).filter(function(t){return String(t.fromAccountId)!==String(t.toAccountId)&&t.amount>0;}):[];
     }
-  }catch(e){data={accounts:[{id:"acc_default",name:"未分類帳戶",initialBalance:0,initialDate:today()}],records:[]};}
+  }catch(e){data={accounts:[{id:"acc_default",name:"未分類帳戶",initialBalance:0,initialDate:today()}],records:[],transfers:[]};}
   if(!data.accounts.length) data.accounts=[{id:"acc_default",name:"未分類帳戶",initialBalance:0,initialDate:today()}];
+  if(!Array.isArray(data.transfers)) data.transfers=[];
   var firstId=data.accounts[0].id;
   for(var i=0;i<data.records.length;i++) if(!data.records[i].accountId) data.records[i].accountId=firstId;
 }
@@ -236,15 +266,27 @@ function accountById(id){
 }
 function accountName(id){var a=accountById(id);return a?a.name:"未分類帳戶";}
 function accountRows(id){return data.records.filter(function(r){return String(r.accountId)===String(id);});}
+function transferRows(id){
+  return data.transfers.filter(function(t){
+    return String(t.fromAccountId)===String(id)||String(t.toAccountId)===String(id);
+  });
+}
+function transferCount(id){return transferRows(id).length;}
 function accountBalance(id){
   var a=accountById(id); if(!a)return 0;
   var rows=accountRows(id);
-  return (Number(a.initialBalance)||0)+sum(rows,"income")-sum(rows,"expense");
+  var balance=(Number(a.initialBalance)||0)+sum(rows,"income")-sum(rows,"expense");
+  for(var i=0;i<data.transfers.length;i++){
+    var t=data.transfers[i],amt=Number(t.amount)||0;
+    if(String(t.fromAccountId)===String(id)) balance-=amt;
+    if(String(t.toAccountId)===String(id)) balance+=amt;
+  }
+  return balance;
 }
 function fillAccounts(){
   var opts="";
   for(var i=0;i<data.accounts.length;i++) opts+='<option value="'+escapeHtml(data.accounts[i].id)+'">'+escapeHtml(data.accounts[i].name)+'</option>';
-  ["accountSelect","initialAccount","editAccount"].forEach(function(id){if($(id))$(id).innerHTML=opts;});
+  ["accountSelect","initialAccount","editAccount","transferFrom","transferTo","editTransferFrom","editTransferTo"].forEach(function(id){if($(id))$(id).innerHTML=opts;});
   var f='<option value="all">全部銀行帳戶</option>'+opts;
   if($("accountFilter"))$("accountFilter").innerHTML=f;
   if(currentAccountId && accountById(currentAccountId)){
@@ -285,25 +327,44 @@ function openAccountDetail(id){
 function closeAccountDetail(){currentAccountId=null;$("accountDetail").style.display="none";render();window.scrollTo({top:0,behavior:"smooth"});}
 function renderAccountDetail(){
   if(!currentAccountId || !accountById(currentAccountId)){$("accountDetail").style.display="none";return;}
-  var a=accountById(currentAccountId),rows=accountRows(currentAccountId).slice().sort(function(x,y){return y.date.localeCompare(x.date)||String(y.id).localeCompare(String(x.id));});
+  var a=accountById(currentAccountId);
+  var rows=accountRows(currentAccountId).slice().sort(function(x,y){return y.date.localeCompare(x.date)||String(y.id).localeCompare(String(x.id));});
+  var transfers=transferRows(currentAccountId).slice().sort(function(x,y){return y.date.localeCompare(x.date)||String(y.id).localeCompare(String(x.id));});
   $("detailTitle").textContent="🏦 "+a.name+"｜帳戶明細";
   $("detailBalance").textContent=money(accountBalance(currentAccountId));
   $("detailIncome").textContent=money(sum(rows,"income"));
   $("detailExpense").textContent=money(sum(rows,"expense"));
   $("detailInitial").textContent=money(a.initialBalance);
-  $("detailCount").textContent=String(rows.length);
+  $("detailCount").textContent=String(rows.length+transfers.length);
+  var events=[];
+  for(var i=0;i<rows.length;i++) events.push({kind:"record",date:rows[i].date,id:rows[i].id,item:rows[i]});
+  for(var j=0;j<transfers.length;j++) events.push({kind:"transfer",date:transfers[j].date,id:transfers[j].id,item:transfers[j]});
+  events.sort(function(x,y){return y.date.localeCompare(x.date)||String(y.id).localeCompare(String(x.id));});
   var html="";
-  for(var i=0;i<rows.length;i++){
-    var r=rows[i];
-    html+='<div class="record"><div class="rtop"><div><div class="rtitle">'+(r.type==="income"?"💵":"💸")+' '+escapeHtml(r.category)+'</div><div class="rmeta">📅 '+escapeHtml(r.date)+'</div></div><div class="ramount '+r.type+'">'+(r.type==="income"?"+":"-")+money(r.amount)+'</div></div>';
-    if(r.note)html+='<div class="rnote">📝 '+escapeHtml(r.note)+'</div>';
-    html+='<div class="actions"><button type="button" class="btn" data-detail-edit="'+escapeHtml(r.id)+'">✏️ 編輯</button><button type="button" class="btn danger" data-detail-delete="'+escapeHtml(r.id)+'">🗑️ 刪除</button></div></div>';
+  for(var z=0;z<events.length;z++){
+    var ev=events[z];
+    if(ev.kind==="record"){
+      var r=ev.item;
+      html+='<div class="record"><div class="rtop"><div><div class="rtitle">'+(r.type==="income"?"💵":"💸")+' '+escapeHtml(r.category)+'</div><div class="rmeta">📅 '+escapeHtml(r.date)+'</div></div><div class="ramount '+r.type+'">'+(r.type==="income"?"+":"-")+money(r.amount)+'</div></div>';
+      if(r.note)html+='<div class="rnote">📝 '+escapeHtml(r.note)+'</div>';
+      html+='<div class="actions"><button type="button" class="btn" data-detail-edit="'+escapeHtml(r.id)+'">✏️ 編輯</button><button type="button" class="btn danger" data-detail-delete="'+escapeHtml(r.id)+'">🗑️ 刪除</button></div></div>';
+    }else{
+      var t=ev.item, incoming=String(t.toAccountId)===String(currentAccountId);
+      var other=accountName(incoming?t.fromAccountId:t.toAccountId);
+      html+='<div class="record transfer-bg"><div class="rtop"><div><div class="rtitle">🔄 '+(incoming?"轉入":"轉出")+'｜'+escapeHtml(other)+'</div><div class="rmeta">📅 '+escapeHtml(t.date)+'</div></div><div class="ramount transfer">'+(incoming?"+":"-")+money(t.amount)+'</div></div>';
+      if(t.note)html+='<div class="rnote">📝 '+escapeHtml(t.note)+'</div>';
+      html+='<div class="actions"><button type="button" class="btn" data-transfer-edit="'+escapeHtml(t.id)+'">✏️ 編輯轉帳</button><button type="button" class="btn danger" data-transfer-delete="'+escapeHtml(t.id)+'">🗑️ 刪除轉帳</button></div></div>';
+    }
   }
   $("detailRecords").innerHTML=html||'<div class="empty">這個帳戶目前沒有交易紀錄</div>';
   var es=$("detailRecords").querySelectorAll("[data-detail-edit]");
-  for(var j=0;j<es.length;j++)es[j].addEventListener("click",function(){openEdit(this.getAttribute("data-detail-edit"));});
+  for(var q=0;q<es.length;q++)es[q].addEventListener("click",function(){openEdit(this.getAttribute("data-detail-edit"));});
   var ds=$("detailRecords").querySelectorAll("[data-detail-delete]");
   for(var k=0;k<ds.length;k++)ds[k].addEventListener("click",function(){deleteRecord(this.getAttribute("data-detail-delete"));});
+  var tes=$("detailRecords").querySelectorAll("[data-transfer-edit]");
+  for(var m=0;m<tes.length;m++)tes[m].addEventListener("click",function(){openTransferEdit(this.getAttribute("data-transfer-edit"));});
+  var tds=$("detailRecords").querySelectorAll("[data-transfer-delete]");
+  for(var n=0;n<tds.length;n++)tds[n].addEventListener("click",function(){deleteTransfer(this.getAttribute("data-transfer-delete"));});
 }
 
 function render(){
@@ -324,7 +385,7 @@ function renderTop(){
   for(var i=0;i<data.accounts.length;i++){total+=accountBalance(data.accounts[i].id);initialTotal+=Number(data.accounts[i].initialBalance)||0;}
   $("total").textContent=money(total);
   $("initial").textContent=money(initialTotal);
-  $("count").textContent=String(data.records.length);
+  $("count").textContent=String(data.records.length+data.transfers.length);
   $("monthTitle").textContent=monthLabel(currentMonth);
 }
 function renderMonth(){
@@ -449,6 +510,52 @@ function showToast(msg){
   var t=$("toast");t.textContent=msg;t.classList.add("show");
   clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(function(){t.classList.remove("show");},1800);
 }
+function addTransfer(){
+  var from=$("transferFrom").value,to=$("transferTo").value,date=$("transferDate").value,amount=Number($("transferAmount").value),note=$("transferNote").value.trim();
+  if(!from||!to){showToast("請選擇轉出與轉入帳戶");return;}
+  if(String(from)===String(to)){showToast("轉出與轉入帳戶不能相同");return;}
+  if(!date){showToast("請選擇轉帳日期");return;}
+  if(!isFinite(amount)||amount<=0){showToast("請輸入大於 0 的轉帳金額");return;}
+  data.transfers.push({id:"tr_"+Date.now()+"_"+Math.random().toString(36).slice(2),fromAccountId:from,toAccountId:to,date:date,amount:amount,note:note});
+  currentMonth=date.slice(0,7);
+  var ok=safeSave();
+  $("transferAmount").value="";$("transferNote").value="";
+  render();
+  showToast(ok?"轉帳完成："+accountName(from)+" → "+accountName(to):"轉帳已建立，但瀏覽器未能保存資料");
+}
+function openTransferEdit(id){
+  var t=null;
+  for(var i=0;i<data.transfers.length;i++) if(String(data.transfers[i].id)===String(id)){t=data.transfers[i];break;}
+  if(!t)return;
+  fillAccounts();
+  $("editTransferFrom").value=t.fromAccountId;
+  $("editTransferTo").value=t.toAccountId;
+  $("editTransferDate").value=t.date;
+  $("editTransferAmount").value=t.amount;
+  $("editTransferNote").value=t.note||"";
+  $("transferModal").classList.add("show");
+  window.__editingTransferId=id;
+}
+function closeTransferEdit(){
+  $("transferModal").classList.remove("show");
+  window.__editingTransferId=null;
+}
+function updateTransfer(){
+  var id=window.__editingTransferId,t=null;
+  for(var i=0;i<data.transfers.length;i++) if(String(data.transfers[i].id)===String(id)){t=data.transfers[i];break;}
+  if(!t)return;
+  var from=$("editTransferFrom").value,to=$("editTransferTo").value,date=$("editTransferDate").value,amount=Number($("editTransferAmount").value);
+  if(!from||!to||String(from)===String(to)){showToast("請確認轉出與轉入帳戶");return;}
+  if(!date||!isFinite(amount)||amount<=0){showToast("請確認日期與金額");return;}
+  t.fromAccountId=from;t.toAccountId=to;t.date=date;t.amount=amount;t.note=$("editTransferNote").value.trim();
+  currentMonth=date.slice(0,7);
+  safeSave();closeTransferEdit();render();showToast("轉帳已修改");
+}
+function deleteTransfer(id){
+  if(!window.confirm("確定刪除這筆轉帳嗎？"))return;
+  data.transfers=data.transfers.filter(function(t){return String(t.id)!==String(id);});
+  safeSave();render();showToast("轉帳已刪除");
+}
 function addRecord(){
   var accountId=$("accountSelect").value,date=$("date").value,cat=$("category").value,amount=Number($("amount").value),note=$("note").value.trim();
   if(!accountId){showToast("請先選擇銀行帳戶");return;}
@@ -491,7 +598,7 @@ function deleteRecord(id){
   safeSave();render();showToast("紀錄已刪除");
 }
 function downloadJSON(name){
-  var blob=new Blob([JSON.stringify({version:4,exportedAt:new Date().toISOString(),accounts:data.accounts,records:data.records},null,2)],{type:"application/json"});
+  var blob=new Blob([JSON.stringify({version:5,exportedAt:new Date().toISOString(),accounts:data.accounts,records:data.records,transfers:data.transfers},null,2)],{type:"application/json"});
   var url=URL.createObjectURL(blob),a=document.createElement("a");
   a.href=url;a.download=name;document.body.appendChild(a);a.click();document.body.removeChild(a);
   setTimeout(function(){URL.revokeObjectURL(url);},1000);
@@ -512,6 +619,11 @@ function restoreFile(file){
       var first=data.accounts[0].id;
       data.records=x.records.map(function(r){return {id:r.id||String(Date.now())+String(Math.random()),type:r.type==="expense"?"expense":"income",date:r.date||today(),category:r.category||"其他",amount:Math.abs(Number(r.amount)||0),note:r.note||"",accountId:r.accountId||first};});
       for(var i=0;i<data.records.length;i++)if(!accountById(data.records[i].accountId))data.records[i].accountId=first;
+      data.transfers=Array.isArray(x.transfers)?x.transfers.map(function(t){return {id:t.id||String(Date.now())+String(Math.random()),fromAccountId:t.fromAccountId||first,toAccountId:t.toAccountId||first,date:t.date||today(),amount:Math.abs(Number(t.amount)||0),note:t.note||""};}).filter(function(t){return String(t.fromAccountId)!==String(t.toAccountId)&&t.amount>0;}):[];
+      for(var j=0;j<data.transfers.length;j++){
+        if(!accountById(data.transfers[j].fromAccountId))data.transfers[j].fromAccountId=first;
+        if(!accountById(data.transfers[j].toAccountId))data.transfers[j].toAccountId=first;
+      }
       safeSave();currentAccountId=null;fillAccounts();currentMonth=today().slice(0,7);render();showToast("資料已還原");
     }catch(e){window.alert("無法還原：檔案不是有效的記帳備份。");}
   };
@@ -531,6 +643,9 @@ function init(){
   currentAccountId=null;
 
   $("date").value=today();
+  $("transferDate").value=today();
+  $("transferFrom").value=data.accounts[0].id;
+  $("transferTo").value=data.accounts.length>1?data.accounts[1].id:data.accounts[0].id;
   $("accountSelect").value=data.accounts[0].id;
   $("initialAccount").value=data.accounts[0].id;
   $("initialAmount").value=data.accounts[0].initialBalance||0;
@@ -540,6 +655,7 @@ function init(){
   $("incomeBtn").addEventListener("click",function(){setType("income");});
   $("expenseBtn").addEventListener("click",function(){setType("expense");});
   $("addBtn").addEventListener("click",addRecord);
+  $("transferBtn").addEventListener("click",addTransfer);
   $("saveInitialBtn").addEventListener("click",saveInitial);
   $("addAccountBtn").addEventListener("click",addAccount);
   $("closeAccountDetail").addEventListener("click",closeAccountDetail);
@@ -572,6 +688,9 @@ function init(){
   $("closeModal").addEventListener("click",closeEdit);
   $("modal").addEventListener("click",function(e){if(e.target===this)closeEdit();});
   $("updateBtn").addEventListener("click",updateRecord);
+  $("closeTransferModal").addEventListener("click",closeTransferEdit);
+  $("transferModal").addEventListener("click",function(e){if(e.target===this)closeTransferEdit();});
+  $("updateTransferBtn").addEventListener("click",updateTransfer);
 
   render();
 }
