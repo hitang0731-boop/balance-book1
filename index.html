@@ -3,8 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f3f6fb">
-<title>💰 我的記帳｜銀行轉帳版</title>
+<meta name="theme-color" content="#2563eb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="我的記帳">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="簡單好用的個人記帳 App，支援銀行帳戶、轉帳、分類統計、月份管理與資料備份。">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<title>💰 我的記帳 App</title>
 <style>
 :root{--bg:#f3f6fb;--card:#fff;--text:#172033;--muted:#718096;--line:#d7e0ec;--blue:#2563eb;--green:#198754;--red:#dc3545}
 *{box-sizing:border-box}
@@ -41,7 +48,11 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 <body>
 <div class="wrap">
 <h1>💰 我的記帳</h1>
-<div class="sub">收入、支出、分類統計與月份管理</div>
+<div class="sub">收入、支出、銀行帳戶、轉帳與統計</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px">
+<button type="button" class="btn primary" id="shareAppBtn">↗ 分享 App</button>
+<button type="button" class="btn" id="installAppBtn" style="display:none">＋ 加入主畫面</button>
+</div>
 
 <section class="card">
 <div class="label">目前總餘額</div><div class="big" id="total">$0</div>
@@ -635,6 +646,31 @@ function moveMonth(delta){
   render();
 }
 
+let deferredInstallPrompt=null;
+
+function setupPWA(){
+  if('serviceWorker' in navigator){
+    window.addEventListener('load',function(){ navigator.serviceWorker.register('./sw.js').catch(function(){}); });
+  }
+  const installBtn=document.getElementById('installAppBtn');
+  const shareBtn=document.getElementById('shareAppBtn');
+  window.addEventListener('beforeinstallprompt',function(e){
+    e.preventDefault(); deferredInstallPrompt=e; if(installBtn) installBtn.style.display='inline-block';
+  });
+  if(installBtn) installBtn.addEventListener('click',async function(){
+    if(deferredInstallPrompt){ deferredInstallPrompt.prompt(); await deferredInstallPrompt.userChoice; deferredInstallPrompt=null; installBtn.style.display='none'; }
+    else { showToast('iPhone 請按 Safari「分享」→「加入主畫面」'); }
+  });
+  if(shareBtn) shareBtn.addEventListener('click',async function(){
+    const shareData={title:'我的記帳 App',text:'這是一個簡單好用的記帳 App，可以管理銀行帳戶、收入、支出與轉帳。',url:location.href};
+    try{
+      if(navigator.share){ await navigator.share(shareData); }
+      else if(navigator.clipboard){ await navigator.clipboard.writeText(location.href); showToast('App 網址已複製'); }
+      else { window.prompt('請複製這個網址分享給朋友：',location.href); }
+    }catch(e){}
+  });
+}
+
 function init(){
   loadData();
   fillCategories();
@@ -694,6 +730,7 @@ function init(){
 
   render();
 }
+setupPWA();
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",init); else init();
 })();
 </script>
