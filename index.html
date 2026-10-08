@@ -296,7 +296,6 @@ function saveBudget(){
 function deleteBudget(id){if(!window.confirm("確定刪除這個預算嗎？"))return;data.budgets=data.budgets.filter(function(b){return String(b.id)!==String(id);});safeSave();renderBudgets();showToast("預算已刪除");}
 function requestBudgetNotification(){if(!("Notification" in window)){showToast("此瀏覽器不支援通知");return;}Notification.requestPermission().then(function(p){showToast(p==="granted"?"已開啟通知提醒":"通知權限未開啟");checkBudgetNotifications();});}
 function checkBudgetNotifications(){if(!("Notification" in window)||Notification.permission!=="granted")return;var m=today().slice(0,7),list=data.budgets.filter(function(b){return b.month===m&&b.enabled;});for(var i=0;i<list.length;i++){var b=list[i],spent=budgetExpense(m,b.category),pct=b.amount?spent/b.amount*100:0,key="budget_notified_"+b.id+"_"+m;if(pct>=b.alertPercent&&!localStorage.getItem(key)){new Notification("我的記帳｜預算提醒",{body:b.category+" 已支出 "+money(spent)+"，達到預算的 "+pct.toFixed(0)+"%"});localStorage.setItem(key,"1");}}}
-}
 function setType(type){
   currentType=type;
   var income=type==="income";
