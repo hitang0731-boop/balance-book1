@@ -86,7 +86,7 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 <div class="label" style="margin-bottom:10px">設定分類預算，支出達到提醒門檻時會顯示警告。</div>
 <div class="form">
 <div><label>預算月份</label><input type="month" id="budgetMonth"></div>
-<div><label>分類</label><select id="budgetCategory"></select></div>
+<div><label>分類</label><select id="budgetCategory"><option value="餐飲">餐飲</option><option value="交通">交通</option><option value="娛樂">娛樂</option><option value="購物">購物</option><option value="日用品">日用品</option><option value="住房">住房</option><option value="醫療">醫療</option><option value="薪資">薪資</option><option value="獎金">獎金</option><option value="兼職">兼職</option><option value="投資">投資</option><option value="其他">其他</option></select></div>
 <div><label>每月預算</label><input type="number" id="budgetAmount" min="0" step="0.01" placeholder="例如 5000" inputmode="decimal"></div>
 <div><label>提醒門檻</label><select id="budgetAlert"><option value="50">50%</option><option value="70">70%</option><option value="80" selected>80%</option><option value="90">90%</option><option value="100">100%</option></select></div>
 </div>
@@ -266,7 +266,7 @@ function fillCategories(){
   $("category").innerHTML=html;
   $("editCategory").innerHTML=html;
   $("categoryFilter").innerHTML="<option value=\"all\">全部分類</option>"+html;
-  $("budgetCategory").innerHTML="<option value="">請選擇預算分類</option>"+html;
+  $("budgetCategory").innerHTML=html;
 }
 function budgetExpense(month,category){return sum(monthRows(month).filter(function(r){return r.category===category;}),"expense");}
 function renderBudgets(){
@@ -708,7 +708,6 @@ function init(){
   $("next").addEventListener("click",function(){moveMonth(1);});
   $("now").addEventListener("click",function(){currentMonth=today().slice(0,7);render();});
   $("budgetMonth").value=currentMonth;
-  $("budgetCategory").value=CATS[0];
   $("budgetCategory").value=CATS[0];
   $("saveBudgetBtn").addEventListener("click",saveBudget);
   $("notifyBtn").addEventListener("click",requestBudgetNotification);
