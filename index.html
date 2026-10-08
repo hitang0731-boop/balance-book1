@@ -266,7 +266,7 @@ function fillCategories(){
   $("category").innerHTML=html;
   $("editCategory").innerHTML=html;
   $("categoryFilter").innerHTML="<option value=\"all\">全部分類</option>"+html;
-  $("budgetCategory").innerHTML=html;
+  $("budgetCategory").innerHTML="<option value="">請選擇預算分類</option>"+html;
 }
 function budgetExpense(month,category){return sum(monthRows(month).filter(function(r){return r.category===category;}),"expense");}
 function renderBudgets(){
@@ -708,6 +708,7 @@ function init(){
   $("next").addEventListener("click",function(){moveMonth(1);});
   $("now").addEventListener("click",function(){currentMonth=today().slice(0,7);render();});
   $("budgetMonth").value=currentMonth;
+  $("budgetCategory").value=CATS[0];
   $("budgetCategory").value=CATS[0];
   $("saveBudgetBtn").addEventListener("click",saveBudget);
   $("notifyBtn").addEventListener("click",requestBudgetNotification);
