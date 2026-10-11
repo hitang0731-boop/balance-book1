@@ -46,6 +46,13 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 
 .search-list-collapse>summary::-webkit-details-marker{display:none}
 .search-list-collapse>summary{width:100%;text-align:center}
+
+.collapsible-section>summary{list-style:none;cursor:pointer;display:block;-webkit-tap-highlight-color:transparent}
+.collapsible-section>summary::-webkit-details-marker{display:none}
+.collapsible-section>summary h2{margin:0 0 2px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.collapse-hint{font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap}
+.collapsible-content{padding-top:14px}
+#toggleTotalVisibility{white-space:nowrap;padding:8px 12px}
 </style>
 </head>
 <body>
@@ -82,10 +89,10 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 
 
 <section class="card">
-<div class="label">目前總餘額</div><div class="big" id="total">$0</div>
+<div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div class="label">目前總餘額</div><button class="btn" id="toggleTotalVisibility" type="button" aria-pressed="false">🙈 隱藏金額</button></div><div class="big" id="total" data-real-value="$0">$0</div>
 <div class="grid2"><div class="stat"><div class="label">初始餘額</div><div class="val" id="initial">$0</div></div><div class="stat"><div class="label">紀錄筆數</div><div class="val" id="count">0</div></div></div>
 </section><section class="card">
-<h2>🏦 銀行帳戶</h2>
+<details class="collapsible-section"><summary><h2>🏦 銀行帳戶 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content">
 <div class="label" style="margin-bottom:10px">每個帳戶會各自計算「初始餘額＋收入－支出」。</div>
 <div class="grid2" id="accountSummary"></div>
 <div class="form" style="margin-top:12px">
@@ -93,7 +100,7 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 <div style="display:flex;align-items:end"><button class="btn primary full" id="addAccountBtn" type="button">＋ 新增帳戶</button></div>
 </div>
 <div id="accountManage" style="margin-top:12px"></div>
-</section><section class="card"><h2>🗓️ 月份總覽</h2><div class="table"><table><thead><tr><th>月份</th><th>收入</th><th>支出</th><th>淨額</th><th>筆數</th></tr></thead><tbody id="monthTable"></tbody></table></div></section><section class="card"><h2>📆 月曆</h2><div class="calendarhead"><div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div></div><div class="calendar" id="calendar"></div></section><section class="card">
+</div></details></section><section class="card"><details class="collapsible-section"><summary><h2>🗓️ 月份總覽 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content"><div class="table"><table><thead><tr><th>月份</th><th>收入</th><th>支出</th><th>淨額</th><th>筆數</th></tr></thead><tbody id="monthTable"></tbody></table></div></div></details></section><section class="card"><h2>📆 月曆</h2><div class="calendarhead"><div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div></div><div class="calendar" id="calendar"></div></section><section class="card">
 <h2>📅 月份切換</h2>
 <div class="monthnav"><button class="btn" id="prev" type="button">‹</button><div class="monthtitle" id="monthTitle"></div><button class="btn" id="next" type="button">›</button></div>
 <div class="grid3" style="margin-top:10px"><div class="stat"><div class="label">本月收入</div><div class="val income" id="mi">$0</div></div><div class="stat"><div class="label">本月支出</div><div class="val expense" id="me">$0</div></div><div class="stat"><div class="label">本月淨額</div><div class="val net" id="mn">$0</div></div></div>
@@ -123,7 +130,7 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 <button class="btn primary full" id="transferBtn" style="margin-top:12px" type="button">🔄 確認轉帳</button>
 <div class="status transfer-bg transfer" id="transferStatus" style="margin-top:10px">轉帳會讓總資產保持不變</div>
 </section><section class="card">
-<h2>🎯 每月預算提醒</h2>
+<details class="collapsible-section"><summary><h2>🎯 每月預算提醒 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content">
 <div class="label" style="margin-bottom:10px">設定分類預算，支出達到提醒門檻時會顯示警告。</div>
 <div class="form">
 <div><label>預算月份</label><input id="budgetMonth" type="month"/></div>
@@ -133,7 +140,7 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 </div>
 <div class="grid2" style="margin-top:12px"><button class="btn primary" id="saveBudgetBtn" type="button">＋ 儲存預算</button><button class="btn" id="notifyBtn" type="button">🔔 開啟通知提醒</button></div>
 <div id="budgetList" style="margin-top:10px"></div>
-</section><section class="card"><h2>🥧 分類圓餅圖</h2><div class="donutbox"><div class="donut" id="donut"><div class="donutcenter"><b id="chartTotal">$0</b><span class="label">本月支出</span></div></div></div><div class="legend" id="legend"></div></section><section class="card"><h2>📈 年度統計</h2><div class="grid3"><div class="stat"><div class="label">年度收入</div><div class="val income" id="yearIncome">$0</div></div><div class="stat"><div class="label">年度支出</div><div class="val expense" id="yearExpense">$0</div></div><div class="stat"><div class="label">年度淨額</div><div class="val net" id="yearNet">$0</div></div></div><div class="monthgrid" id="yearGrid" style="margin-top:10px"></div></section><section class="card"><h2>🔎 搜尋紀錄</h2><details class="search-list-collapse"><summary class="btn" style="list-style:none;cursor:pointer;margin-top:8px">展開／收合搜尋與整份紀錄清單</summary><div class="filters" style="margin-top:12px"><input id="search" placeholder="搜尋分類、備註或帳戶"/><select id="accountFilter"><option value="all">全部銀行帳戶</option></select><select id="typeFilter"><option value="all">全部</option><option value="income">收入</option><option value="expense">支出</option></select><select id="categoryFilter"><option value="all">全部分類</option></select><input id="monthFilter" type="month"/></div><button class="btn" id="clearSearch" style="margin-top:10px" type="button">清除搜尋</button><div id="records" style="margin-top:10px"></div></details></section><section class="card">
+</div></details></section><section class="card"><h2>🥧 分類圓餅圖</h2><div class="donutbox"><div class="donut" id="donut"><div class="donutcenter"><b id="chartTotal">$0</b><span class="label">本月支出</span></div></div></div><div class="legend" id="legend"></div></section><section class="card"><details class="collapsible-section"><summary><h2>📈 年度統計 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content"><div class="grid3"><div class="stat"><div class="label">年度收入</div><div class="val income" id="yearIncome">$0</div></div><div class="stat"><div class="label">年度支出</div><div class="val expense" id="yearExpense">$0</div></div><div class="stat"><div class="label">年度淨額</div><div class="val net" id="yearNet">$0</div></div></div><div class="monthgrid" id="yearGrid" style="margin-top:10px"></div></div></details></section><section class="card"><h2>🔎 搜尋紀錄</h2><details class="search-list-collapse"><summary class="btn" style="list-style:none;cursor:pointer;margin-top:8px">展開／收合搜尋與整份紀錄清單</summary><div class="filters" style="margin-top:12px"><input id="search" placeholder="搜尋分類、備註或帳戶"/><select id="accountFilter"><option value="all">全部銀行帳戶</option></select><select id="typeFilter"><option value="all">全部</option><option value="income">收入</option><option value="expense">支出</option></select><select id="categoryFilter"><option value="all">全部分類</option></select><input id="monthFilter" type="month"/></div><button class="btn" id="clearSearch" style="margin-top:10px" type="button">清除搜尋</button><div id="records" style="margin-top:10px"></div></details></section><section class="card">
 <h2>⚙️ 初始餘額</h2>
 <div class="form">
 <div><label>銀行帳戶</label><select id="initialAccount"></select></div>
@@ -739,6 +746,14 @@ function init(){
   $("closeTransferModal").addEventListener("click",closeTransferEdit);
   $("transferModal").addEventListener("click",function(e){if(e.target===this)closeTransferEdit();});
   $("updateTransferBtn").addEventListener("click",updateTransfer);
+
+  var totalHidden=false;
+  $("toggleTotalVisibility").addEventListener("click",function(){
+    totalHidden=!totalHidden;
+    var el=$("total");
+    if(totalHidden){el.textContent="••••••";this.textContent="👁️ 顯示金額";this.setAttribute("aria-pressed","true");}
+    else{el.textContent=money(data.accounts.reduce(function(sum,a){return sum+accountBalance(a.id);},0));this.textContent="🙈 隱藏金額";this.setAttribute("aria-pressed","false");}
+  });
 
   render();
 }
