@@ -1,14 +1,16 @@
 <!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-Hant">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f3f6fb">
-<link rel="manifest" href="./manifest.webmanifest">
-<link rel="apple-touch-icon" href="./icons/icon-180.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="我的記帳">
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<meta content="#f3f6fb" name="theme-color"/>
+<link href="./manifest.webmanifest" rel="manifest"/>
+<link href="./icons/icon-180.png" rel="apple-touch-icon"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="default" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="我的記帳" name="apple-mobile-web-app-title"/>
 <title>💰 我的記帳｜銀行轉帳版</title>
 <style>
 :root{--bg:#f3f6fb;--card:#fff;--text:#172033;--muted:#718096;--line:#d7e0ec;--blue:#2563eb;--green:#198754;--red:#dc3545}
@@ -36,7 +38,7 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 .table{overflow:auto}table{width:100%;border-collapse:collapse;min-width:500px}th,td{padding:10px 7px;border-bottom:1px solid var(--line);text-align:right}th:first-child,td:first-child{text-align:left}
 .calendarhead,.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.calendarhead{text-align:center;color:var(--muted);font-size:12px;margin-bottom:4px}.day{min-height:65px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:5px;text-align:left}.day.today{outline:2px solid #8fb2ff}.daynum{font-weight:900}.dm{font-size:10px;margin-top:3px}
 .monthgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.monthbox{border:1px solid var(--line);border-radius:14px;padding:10px;background:#fbfcff;text-align:left}
-.filters{display:grid;grid-template-columns:1fr 1fr;gap:10px}.record{border:1px solid var(--line);border-radius:15px;padding:12px;margin:8px 0}.rtop{display:flex;justify-content:space-between;gap:8px}.rtitle{font-weight:900}.ramount{font-weight:900}.rmeta{font-size:13px;color:var(--muted)}.rnote{margin-top:5px;color:#4a5568}.actions{display:flex;gap:7px;margin-top:8px;flex-wrap:wrap}.empty{text-align:center;color:var(--muted);padding:18px}
+.filters{display:grid;grid-template-columns:1fr 1fr;gap:10px}.record{border:1px solid var(--line);border-radius:15px;padding:0;margin:8px 0;overflow:hidden;background:#fff}.record-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;border:0;background:#fff;padding:13px;color:var(--text);-webkit-tap-highlight-color:transparent}.record-toggle:active{background:#f7f9fc}.record-summary{min-width:0;flex:1}.record-summary-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.rtitle{font-weight:900;overflow-wrap:anywhere}.ramount{font-weight:900;white-space:nowrap}.rmeta{font-size:12px;color:var(--muted);margin-top:4px}.record-chevron{color:var(--muted);font-size:16px;flex-shrink:0}.record-details{display:none;padding:0 13px 13px;border-top:1px solid var(--line)}.record-details.open{display:block}.rnote{margin-top:9px;color:#4a5568;overflow-wrap:anywhere}.actions{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}.actions .btn{padding:9px 12px}.empty{text-align:center;color:var(--muted);padding:18px}
 .budgetbar{height:12px;background:#edf1f7;border-radius:999px;overflow:hidden;margin:8px 0}.budgetfill{height:100%;border-radius:999px}.budgetok{background:#eaf8f0;border:1px solid #b7e4c7}.budgetwarn{background:#fff7e6;border:1px solid #f6d28b}.budgetdanger{background:#fff0f1;border:1px solid #f1b8be}.budgetitem{border:1px solid var(--line);border-radius:16px;padding:12px;margin-top:10px}.budgetmeta{display:flex;justify-content:space-between;gap:8px;align-items:center;font-weight:800}.transfer{color:#7c3aed}.transfer-bg{background:#f5f0ff;border-color:#c4b5fd}.transfer-arrow{font-size:24px;font-weight:900;color:#7c3aed}.account-card{cursor:pointer;border:2px solid var(--line);border-radius:18px;padding:14px;background:#fbfcff;transition:.15s}.account-card:active{transform:scale(.98)}.account-card:hover{border-color:#9bb8f5}.account-name{font-size:19px;font-weight:900}.account-balance{font-size:28px;font-weight:900;margin:5px 0}.account-mini{font-size:13px;color:var(--muted)}
 .modalbg{position:fixed;inset:0;background:#0008;display:none;align-items:flex-end;padding:10px;z-index:20}.modalbg.show{display:flex}.modal{width:min(700px,100%);background:#fff;border-radius:24px;padding:18px;max-height:90vh;overflow:auto}.modalhead{display:flex;justify-content:space-between}.close{border:0;background:#f1f4f8;border-radius:50%;width:42px;height:42px;font-size:22px}
 .toast{position:fixed;left:50%;bottom:25px;transform:translateX(-50%);background:#172033;color:#fff;padding:12px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:.2s;z-index:50}.toast.show{opacity:1}
@@ -46,28 +48,13 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 <body>
 <div class="wrap">
 <h1>💰 我的記帳</h1>
-<div class="sub">收入、支出、分類統計與月份管理</div>
+<div class="sub">收入、支出、銀行帳戶與月份管理</div>
 
-<section class="card">
-<div class="label">目前總餘額</div><div class="big" id="total">$0</div>
-<div class="grid2"><div class="stat"><div class="label">初始餘額</div><div class="val" id="initial">$0</div></div><div class="stat"><div class="label">紀錄筆數</div><div class="val" id="count">0</div></div></div>
-</section>
-
-<section class="card">
-<h2>🏦 銀行帳戶</h2>
-<div class="label" style="margin-bottom:10px">每個帳戶會各自計算「初始餘額＋收入－支出」。</div>
-<div id="accountSummary" class="grid2"></div>
-<div class="form" style="margin-top:12px">
-<div><label>新增銀行帳戶</label><input id="newAccountName" placeholder="例如：國泰、玉山、台新"></div>
-<div style="display:flex;align-items:end"><button type="button" class="btn primary full" id="addAccountBtn">＋ 新增帳戶</button></div>
-</div>
-<div id="accountManage" style="margin-top:12px"></div>
-</section>
 
 <section class="card" id="accountDetail" style="display:none">
 <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
 <h2 id="detailTitle" style="margin:0">🏦 帳戶明細</h2>
-<button type="button" class="btn" id="closeAccountDetail">← 回到帳戶總覽</button>
+<button class="btn" id="closeAccountDetail" type="button">← 回到帳戶總覽</button>
 </div>
 <div class="grid3" style="margin-top:12px">
 <div class="stat"><div class="label">目前餘額</div><div class="val" id="detailBalance">$0</div></div>
@@ -79,113 +66,109 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 <div id="detailRecords"></div>
 </section>
 
-<section class="card">
-<h2>📅 月份切換</h2>
-<div class="monthnav"><button type="button" class="btn" id="prev">‹</button><div class="monthtitle" id="monthTitle"></div><button type="button" class="btn" id="next">›</button></div>
-<div class="grid3" style="margin-top:10px"><div class="stat"><div class="label">本月收入</div><div class="val income" id="mi">$0</div></div><div class="stat"><div class="label">本月支出</div><div class="val expense" id="me">$0</div></div><div class="stat"><div class="label">本月淨額</div><div class="val net" id="mn">$0</div></div></div>
-<button type="button" class="btn" id="now" style="margin-top:10px">回到本月</button>
-</section>
+
+
+
+
+
+
+
+
+
+
+
 
 <section class="card">
-<h2>🎯 每月預算提醒</h2>
-<div class="label" style="margin-bottom:10px">設定分類預算，支出達到提醒門檻時會顯示警告。</div>
-<div class="form">
-<div><label>預算月份</label><input type="month" id="budgetMonth"></div>
-<div><label>分類</label><select id="budgetCategory"><option value="餐飲">餐飲</option><option value="交通">交通</option><option value="娛樂">娛樂</option><option value="購物">購物</option><option value="日用品">日用品</option><option value="住房">住房</option><option value="醫療">醫療</option><option value="薪資">薪資</option><option value="獎金">獎金</option><option value="兼職">兼職</option><option value="投資">投資</option><option value="其他">其他</option></select></div>
-<div><label>每月預算</label><input type="number" id="budgetAmount" min="0" step="0.01" placeholder="例如 5000" inputmode="decimal"></div>
-<div><label>提醒門檻</label><select id="budgetAlert"><option value="50">50%</option><option value="70">70%</option><option value="80" selected>80%</option><option value="90">90%</option><option value="100">100%</option></select></div>
+<div class="label">目前總餘額</div><div class="big" id="total">$0</div>
+<div class="grid2"><div class="stat"><div class="label">初始餘額</div><div class="val" id="initial">$0</div></div><div class="stat"><div class="label">紀錄筆數</div><div class="val" id="count">0</div></div></div>
+</section><section class="card">
+<h2>🏦 銀行帳戶</h2>
+<div class="label" style="margin-bottom:10px">每個帳戶會各自計算「初始餘額＋收入－支出」。</div>
+<div class="grid2" id="accountSummary"></div>
+<div class="form" style="margin-top:12px">
+<div><label>新增銀行帳戶</label><input id="newAccountName" placeholder="例如：國泰、玉山、台新"/></div>
+<div style="display:flex;align-items:end"><button class="btn primary full" id="addAccountBtn" type="button">＋ 新增帳戶</button></div>
 </div>
-<div class="grid2" style="margin-top:12px"><button type="button" class="btn primary" id="saveBudgetBtn">＋ 儲存預算</button><button type="button" class="btn" id="notifyBtn">🔔 開啟通知提醒</button></div>
-<div id="budgetList" style="margin-top:10px"></div>
-</section>
-
-<section class="card">
+<div id="accountManage" style="margin-top:12px"></div>
+</section><section class="card">
+<h2>⚙️ 初始餘額</h2>
+<div class="form">
+<div><label>銀行帳戶</label><select id="initialAccount"></select></div>
+<div><label>初始餘額</label><input id="initialAmount" inputmode="decimal" step="0.01" type="number"/></div>
+<div><label>初始日期</label><input id="initialDate" type="date"/></div>
+</div>
+<button class="btn primary full" id="saveInitialBtn" style="margin-top:12px" type="button">儲存初始餘額</button>
+<div class="label" style="margin-top:8px;font-size:13px">初始餘額只計入總餘額，不算入月份收入或支出。</div>
+</section><section class="card"><h2>🗓️ 月份總覽</h2><div class="table"><table><thead><tr><th>月份</th><th>收入</th><th>支出</th><th>淨額</th><th>筆數</th></tr></thead><tbody id="monthTable"></tbody></table></div></section><section class="card"><h2>📆 月曆</h2><div class="calendarhead"><div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div></div><div class="calendar" id="calendar"></div></section><section class="card">
+<h2>📅 月份切換</h2>
+<div class="monthnav"><button class="btn" id="prev" type="button">‹</button><div class="monthtitle" id="monthTitle"></div><button class="btn" id="next" type="button">›</button></div>
+<div class="grid3" style="margin-top:10px"><div class="stat"><div class="label">本月收入</div><div class="val income" id="mi">$0</div></div><div class="stat"><div class="label">本月支出</div><div class="val expense" id="me">$0</div></div><div class="stat"><div class="label">本月淨額</div><div class="val net" id="mn">$0</div></div></div>
+<button class="btn" id="now" style="margin-top:10px" type="button">回到本月</button>
+</section><section class="card">
 <h2>＋ 新增紀錄</h2>
-<div class="tabs"><button type="button" class="tab in active" id="incomeBtn">🟢 收入</button><button type="button" class="tab out" id="expenseBtn">🔴 支出</button></div>
-<div id="status" class="status in">目前選擇：收入</div>
+<div class="tabs"><button class="tab in active" id="incomeBtn" type="button">🟢 收入</button><button class="tab out" id="expenseBtn" type="button">🔴 支出</button></div>
+<div class="status in" id="status">目前選擇：收入</div>
 <div class="form">
 <div><label>銀行帳戶</label><select id="accountSelect"></select></div>
-<div><label>日期</label><input type="date" id="date"></div>
+<div><label>日期</label><input id="date" type="date"/></div>
 <div><label>分類</label><select id="category"></select></div>
-<div><label>金額</label><input type="number" id="amount" min="0" step="0.01" placeholder="例如 500" inputmode="decimal"></div>
-<div><label>備註</label><input id="note" placeholder="例如 午餐"></div>
+<div><label>金額</label><input id="amount" inputmode="decimal" min="0" placeholder="例如 500" step="0.01" type="number"/></div>
+<div><label>備註</label><input id="note" placeholder="例如 午餐"/></div>
 </div>
-<button type="button" class="btn primary full" id="addBtn" style="margin-top:12px">＋ 新增收入</button>
-</section>
-
-<section class="card">
+<button class="btn primary full" id="addBtn" style="margin-top:12px" type="button">＋ 新增收入</button>
+</section><section class="card">
 <h2>🔄 帳戶轉帳</h2>
 <div class="label" style="margin-bottom:10px">把錢從一個帳戶轉到另一個帳戶。這不算收入或支出，只會讓兩邊餘額一增一減。</div>
 <div class="form">
 <div><label>轉出帳戶</label><select id="transferFrom"></select></div>
 <div><label>轉入帳戶</label><select id="transferTo"></select></div>
-<div><label>日期</label><input type="date" id="transferDate"></div>
-<div><label>金額</label><input type="number" id="transferAmount" min="0" step="0.01" placeholder="例如 10000" inputmode="decimal"></div>
-<div><label>備註</label><input id="transferNote" placeholder="例如 每月存款"></div>
+<div><label>日期</label><input id="transferDate" type="date"/></div>
+<div><label>金額</label><input id="transferAmount" inputmode="decimal" min="0" placeholder="例如 10000" step="0.01" type="number"/></div>
+<div><label>備註</label><input id="transferNote" placeholder="例如 每月存款"/></div>
 </div>
-<button type="button" class="btn primary full" id="transferBtn" style="margin-top:12px">🔄 確認轉帳</button>
-<div id="transferStatus" class="status transfer-bg transfer" style="margin-top:10px">轉帳會讓總資產保持不變</div>
-</section>
-
-<section class="card">
-<h2>⚙️ 初始餘額</h2>
+<button class="btn primary full" id="transferBtn" style="margin-top:12px" type="button">🔄 確認轉帳</button>
+<div class="status transfer-bg transfer" id="transferStatus" style="margin-top:10px">轉帳會讓總資產保持不變</div>
+</section><section class="card">
+<h2>🎯 每月預算提醒</h2>
+<div class="label" style="margin-bottom:10px">設定分類預算，支出達到提醒門檻時會顯示警告。</div>
 <div class="form">
-<div><label>銀行帳戶</label><select id="initialAccount"></select></div>
-<div><label>初始餘額</label><input type="number" id="initialAmount" step="0.01" inputmode="decimal"></div>
-<div><label>初始日期</label><input type="date" id="initialDate"></div>
+<div><label>預算月份</label><input id="budgetMonth" type="month"/></div>
+<div><label>分類</label><select id="budgetCategory"><option value="餐飲">餐飲</option><option value="交通">交通</option><option value="娛樂">娛樂</option><option value="購物">購物</option><option value="日用品">日用品</option><option value="住房">住房</option><option value="醫療">醫療</option><option value="薪資">薪資</option><option value="獎金">獎金</option><option value="兼職">兼職</option><option value="投資">投資</option><option value="其他">其他</option></select></div>
+<div><label>每月預算</label><input id="budgetAmount" inputmode="decimal" min="0" placeholder="例如 5000" step="0.01" type="number"/></div>
+<div><label>提醒門檻</label><select id="budgetAlert"><option value="50">50%</option><option value="70">70%</option><option selected="" value="80">80%</option><option value="90">90%</option><option value="100">100%</option></select></div>
 </div>
-<button type="button" class="btn primary full" id="saveInitialBtn" style="margin-top:12px">儲存初始餘額</button>
-<div class="label" style="margin-top:8px;font-size:13px">初始餘額只計入總餘額，不算入月份收入或支出。</div>
-</section>
-
-<section class="card"><h2>🥧 分類圓餅圖</h2><div class="donutbox"><div class="donut" id="donut"><div class="donutcenter"><b id="chartTotal">$0</b><span class="label">本月支出</span></div></div></div><div id="legend" class="legend"></div></section>
-
-<section class="card"><h2>🏆 分類排行榜</h2><div class="tabs"><button type="button" class="tab out active" id="rankExpense">支出排行</button><button type="button" class="tab in" id="rankIncome">收入排行</button></div><div id="rank" class="rank" style="margin-top:12px"></div></section>
-
-<section class="card"><h2>📊 分類統計</h2><div class="table"><table><thead><tr><th>分類</th><th>收入</th><th>支出</th><th>餘額</th></tr></thead><tbody id="categoryTable"></tbody></table></div></section>
-
-<section class="card"><h2>📆 月曆</h2><div class="calendarhead"><div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div></div><div id="calendar" class="calendar"></div></section>
-
-<section class="card"><h2>📈 年度統計</h2><div class="grid3"><div class="stat"><div class="label">年度收入</div><div class="val income" id="yearIncome">$0</div></div><div class="stat"><div class="label">年度支出</div><div class="val expense" id="yearExpense">$0</div></div><div class="stat"><div class="label">年度淨額</div><div class="val net" id="yearNet">$0</div></div></div><div id="yearGrid" class="monthgrid" style="margin-top:10px"></div></section>
-
-<section class="card"><h2>🗓️ 月份總覽</h2><div class="table"><table><thead><tr><th>月份</th><th>收入</th><th>支出</th><th>淨額</th><th>筆數</th></tr></thead><tbody id="monthTable"></tbody></table></div></section>
-
-<section class="card"><h2>🔎 搜尋紀錄</h2><div class="filters"><input id="search" placeholder="搜尋分類、備註或帳戶"><select id="accountFilter"><option value="all">全部銀行帳戶</option></select><select id="typeFilter"><option value="all">全部</option><option value="income">收入</option><option value="expense">支出</option></select><select id="categoryFilter"><option value="all">全部分類</option></select><input type="month" id="monthFilter"></div><button type="button" class="btn" id="clearSearch" style="margin-top:10px">清除搜尋</button><div id="records" style="margin-top:10px"></div></section>
-
-<section class="card">
+<div class="grid2" style="margin-top:12px"><button class="btn primary" id="saveBudgetBtn" type="button">＋ 儲存預算</button><button class="btn" id="notifyBtn" type="button">🔔 開啟通知提醒</button></div>
+<div id="budgetList" style="margin-top:10px"></div>
+</section><section class="card"><h2>🥧 分類圓餅圖</h2><div class="donutbox"><div class="donut" id="donut"><div class="donutcenter"><b id="chartTotal">$0</b><span class="label">本月支出</span></div></div></div><div class="legend" id="legend"></div></section><section class="card"><h2>📈 年度統計</h2><div class="grid3"><div class="stat"><div class="label">年度收入</div><div class="val income" id="yearIncome">$0</div></div><div class="stat"><div class="label">年度支出</div><div class="val expense" id="yearExpense">$0</div></div><div class="stat"><div class="label">年度淨額</div><div class="val net" id="yearNet">$0</div></div></div><div class="monthgrid" id="yearGrid" style="margin-top:10px"></div></section><section class="card"><h2>🔎 搜尋紀錄</h2><div class="filters"><input id="search" placeholder="搜尋分類、備註或帳戶"/><select id="accountFilter"><option value="all">全部銀行帳戶</option></select><select id="typeFilter"><option value="all">全部</option><option value="income">收入</option><option value="expense">支出</option></select><select id="categoryFilter"><option value="all">全部分類</option></select><input id="monthFilter" type="month"/></div><button class="btn" id="clearSearch" style="margin-top:10px" type="button">清除搜尋</button><div id="records" style="margin-top:10px"></div></section><section class="card">
 <h2>💾 資料備份</h2>
-<div class="grid2"><button type="button" class="btn" id="exportBtn">匯出 JSON</button><button type="button" class="btn" id="backupBtn">完整備份</button></div>
-<label class="btn" style="display:block;text-align:center;margin-top:10px;color:#2563eb">📥 還原備份<input type="file" id="restoreInput" accept=".json,application/json" style="display:none"></label>
-<button type="button" class="btn danger full" id="clearAllBtn" style="margin-top:10px">清除全部紀錄</button>
-</section>
-</div>
-
-<div id="transferModal" class="modalbg"><div class="modal">
-<div class="modalhead"><h2>✏️ 編輯轉帳</h2><button type="button" class="close" id="closeTransferModal">×</button></div>
+<div class="grid2"><button class="btn" id="exportBtn" type="button">匯出 JSON</button><button class="btn" id="backupBtn" type="button">完整備份</button></div>
+<label class="btn" style="display:block;text-align:center;margin-top:10px;color:#2563eb">📥 還原備份<input accept=".json,application/json" id="restoreInput" style="display:none" type="file"/></label>
+<button class="btn danger full" id="clearAllBtn" style="margin-top:10px" type="button">清除全部紀錄</button>
+</section></div>
+<div class="modalbg" id="transferModal"><div class="modal">
+<div class="modalhead"><h2>✏️ 編輯轉帳</h2><button class="close" id="closeTransferModal" type="button">×</button></div>
 <div class="form">
 <div><label>轉出帳戶</label><select id="editTransferFrom"></select></div>
 <div><label>轉入帳戶</label><select id="editTransferTo"></select></div>
-<div><label>日期</label><input type="date" id="editTransferDate"></div>
-<div><label>金額</label><input type="number" id="editTransferAmount" min="0" step="0.01" inputmode="decimal"></div>
-<div style="grid-column:1/-1"><label>備註</label><input id="editTransferNote"></div>
+<div><label>日期</label><input id="editTransferDate" type="date"/></div>
+<div><label>金額</label><input id="editTransferAmount" inputmode="decimal" min="0" step="0.01" type="number"/></div>
+<div style="grid-column:1/-1"><label>備註</label><input id="editTransferNote"/></div>
 </div>
-<button type="button" class="btn primary full" id="updateTransferBtn" style="margin-top:12px">儲存轉帳修改</button>
+<button class="btn primary full" id="updateTransferBtn" style="margin-top:12px" type="button">儲存轉帳修改</button>
 </div></div>
-
-<div id="modal" class="modalbg"><div class="modal">
-<div class="modalhead"><h2>✏️ 編輯紀錄</h2><button type="button" class="close" id="closeModal">×</button></div>
+<div class="modalbg" id="modal"><div class="modal">
+<div class="modalhead"><h2>✏️ 編輯紀錄</h2><button class="close" id="closeModal" type="button">×</button></div>
 <div class="form">
 <div><label>銀行帳戶</label><select id="editAccount"></select></div>
-<div><label>日期</label><input type="date" id="editDate"></div>
+<div><label>日期</label><input id="editDate" type="date"/></div>
 <div><label>類型</label><select id="editType"><option value="income">收入</option><option value="expense">支出</option></select></div>
 <div><label>分類</label><select id="editCategory"></select></div>
-<div><label>金額</label><input type="number" id="editAmount" step="0.01" inputmode="decimal"></div>
-<div style="grid-column:1/-1"><label>備註</label><input id="editNote"></div>
+<div><label>金額</label><input id="editAmount" inputmode="decimal" step="0.01" type="number"/></div>
+<div style="grid-column:1/-1"><label>備註</label><input id="editNote"/></div>
 </div>
-<button type="button" class="btn primary full" id="updateBtn" style="margin-top:12px">儲存修改</button>
+<button class="btn primary full" id="updateBtn" style="margin-top:12px" type="button">儲存修改</button>
 </div></div>
-<div id="toast" class="toast"></div>
-
+<div class="toast" id="toast"></div>
 <script>
 (function(){
 "use strict";
@@ -420,8 +403,6 @@ function render(){
   renderBudgets();
   checkBudgetNotifications();
   renderChart();
-  renderRank();
-  renderCategoryTable();
   renderCalendar();
   renderYear();
   renderMonths();
@@ -542,12 +523,24 @@ function getFiltered(){
 function renderRecords(){
   var rows=getFiltered(),html="";
   for(var i=0;i<rows.length;i++){
-    var r=rows[i];
-    html+='<div class="record"><div class="rtop"><div><div class="rtitle">'+(r.type==="income"?"💵":"💸")+" "+escapeHtml(r.category)+'</div><div class="rmeta">🏦 '+escapeHtml(accountName(r.accountId))+'　📅 '+escapeHtml(r.date)+'</div></div><div class="ramount '+r.type+'">'+(r.type==="income"?"+":"-")+money(r.amount)+'</div></div>';
+    var r=rows[i],rid=escapeHtml(r.id);
+    html+='<div class="record">';
+    html+='<button type="button" class="record-toggle" data-toggle-record="'+rid+'" aria-expanded="false">';
+    html+='<div class="record-summary"><div class="record-summary-top"><span class="rtitle">'+(r.type==="income"?"💵 收入 · ":"💸 支出 · ")+escapeHtml(r.category)+'</span><span class="ramount '+r.type+'">'+(r.type==="income"?"+":"-")+money(r.amount)+'</span></div>';
+    html+='<div class="rmeta">📅 '+escapeHtml(r.date)+'　⌄ 點擊查看詳情</div></div><span class="record-chevron">＋</span></button>';
+    html+='<div class="record-details" data-record-details="'+rid+'"><div class="rmeta" style="margin-top:10px">🏦 銀行帳戶：'+escapeHtml(accountName(r.accountId))+'</div>';
     if(r.note) html+='<div class="rnote">📝 '+escapeHtml(r.note)+'</div>';
-    html+='<div class="actions"><button type="button" class="btn" data-edit="'+escapeHtml(r.id)+'">✏️ 編輯</button><button type="button" class="btn danger" data-delete="'+escapeHtml(r.id)+'">🗑️ 刪除</button></div></div>';
+    html+='<div class="actions"><button type="button" class="btn" data-edit="'+rid+'">✏️ 編輯</button><button type="button" class="btn danger" data-delete="'+rid+'">🗑️ 刪除</button></div></div></div>';
   }
   $("records").innerHTML=html||'<div class="empty">沒有符合條件的紀錄</div>';
+  var ts=$("records").querySelectorAll("[data-toggle-record]");
+  for(var t=0;t<ts.length;t++) ts[t].addEventListener("click",function(){
+    var id=this.getAttribute("data-toggle-record"),details=$("records").querySelector('[data-record-details="'+id+'"]');
+    if(!details)return;
+    var open=details.classList.toggle("open");this.setAttribute("aria-expanded",open?"true":"false");
+    var icon=this.querySelector(".record-chevron");if(icon)icon.textContent=open?"−":"＋";
+    var meta=this.querySelector(".rmeta");if(meta)meta.innerHTML="📅 "+meta.textContent.split("📅 ")[1].split("　")[0]+(open?"　⌃ 已展開":"　⌄ 點擊查看詳情");
+  });
   var es=$("records").querySelectorAll("[data-edit]");
   for(var j=0;j<es.length;j++) es[j].addEventListener("click",function(){openEdit(this.getAttribute("data-edit"));});
   var ds=$("records").querySelectorAll("[data-delete]");
@@ -717,8 +710,6 @@ function init(){
   $("notifyBtn").addEventListener("click",requestBudgetNotification);
   $("budgetMonth").addEventListener("change",renderBudgets);
 
-  $("rankExpense").addEventListener("click",function(){rankType="expense";render();});
-  $("rankIncome").addEventListener("click",function(){rankType="income";render();});
 
   $("search").addEventListener("input",renderRecords);
   $("accountFilter").addEventListener("change",renderRecords);
@@ -750,7 +741,6 @@ function init(){
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",init); else init();
 })();
 </script>
-
 <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js").catch(function(){});});}</script>
 </body>
 </html>
