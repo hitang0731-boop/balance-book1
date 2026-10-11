@@ -659,7 +659,12 @@ function restoreFile(file){
   reader.onload=function(){
     try{
       var x=JSON.parse(reader.result);
-      if(!x||!Array.isArray(x.records))throw new Error("bad");
+      // 相容新版完整備份、舊版匯出，以及包在 data / backup / payload 裡的備份格式
+      if(x && x.data && typeof x.data==="object") x=x.data;
+      else if(x && x.backup && typeof x.backup==="object") x=x.backup;
+      else if(x && x.payload && typeof x.payload==="object") x=x.payload;
+      if(!x || (!Array.isArray(x.records) && !Array.isArray(x.transactions) && !Array.isArray(x.entries))) throw new Error("bad");
+      if(!Array.isArray(x.records)) x.records=Array.isArray(x.transactions)?x.transactions:x.entries;
       if(!window.confirm("還原會覆蓋目前資料，確定嗎？"))return;
       if(Array.isArray(x.accounts)&&x.accounts.length){
         data.accounts=x.accounts.map(function(a){return {id:a.id||("acc_"+Date.now()+Math.random()),name:a.name||"銀行帳戶",initialBalance:Number(a.initialBalance)||0,initialDate:a.initialDate||today()};});
@@ -675,8 +680,12 @@ function restoreFile(file){
         if(!accountById(data.transfers[j].fromAccountId))data.transfers[j].fromAccountId=first;
         if(!accountById(data.transfers[j].toAccountId))data.transfers[j].toAccountId=first;
       }
-      safeSave();currentAccountId=null;fillAccounts();currentMonth=today().slice(0,7);render();showToast("資料已還原");
-    }catch(e){window.alert("無法還原：檔案不是有效的記帳備份。");}
+      if(!safeSave()) throw new Error("save_failed");
+      currentAccountId=null;fillAccounts();currentMonth=today().slice(0,7);render();showToast("資料已還原");
+    }catch(e){
+      if(e && e.message==="save_failed") window.alert("資料格式可讀取，但手機儲存空間無法寫入。請確認 Safari 網站資料空間後再試。");
+      else window.alert("無法還原這份備份。請確認選取的是記帳 JSON 備份檔；若仍失敗，請把備份檔傳給我，我可以協助檢查格式。");
+    }
   };
   reader.readAsText(file);
 }
