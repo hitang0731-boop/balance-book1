@@ -89,7 +89,7 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 
 
 <section class="card">
-<div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div class="label">目前總餘額</div><button class="btn" id="toggleTotalVisibility" type="button" aria-pressed="false">🙈 隱藏金額</button></div><div class="big" id="total" data-real-value="$0">$0</div>
+<div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div class="label">目前總餘額</div><button class="btn" id="toggleTotalVisibility" type="button" aria-pressed="true">👁️ 顯示金額</button></div><div class="big" id="total" data-real-value="$0">$0</div>
 <div class="grid2"><div class="stat"><div class="label">初始餘額</div><div class="val" id="initial">$0</div></div><div class="stat"><div class="label">紀錄筆數</div><div class="val" id="count">0</div></div></div>
 </section><section class="card">
 <details class="collapsible-section"><summary><h2>🏦 銀行帳戶 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content">
@@ -181,7 +181,7 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 <div class="toast" id="toast"></div>
 <script>
 (function(){
-var totalHidden=false;
+var totalHidden=true;
 "use strict";
 
 var KEY="balance_book_shared_category_v1";
