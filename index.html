@@ -181,6 +181,7 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 <div class="toast" id="toast"></div>
 <script>
 (function(){
+var totalHidden=false;
 "use strict";
 
 var KEY="balance_book_shared_category_v1";
@@ -756,7 +757,6 @@ function init(){
   $("transferModal").addEventListener("click",function(e){if(e.target===this)closeTransferEdit();});
   $("updateTransferBtn").addEventListener("click",updateTransfer);
 
-  var totalHidden=false;
   $("toggleTotalVisibility").addEventListener("click",function(){
     totalHidden=!totalHidden;
     var el=$("total"),initialEl=$("initial");
