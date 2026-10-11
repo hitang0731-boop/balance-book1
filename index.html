@@ -139,8 +139,7 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 <div><label>提醒門檻</label><select id="budgetAlert"><option value="50">50%</option><option value="70">70%</option><option selected="" value="80">80%</option><option value="90">90%</option><option value="100">100%</option></select></div>
 </div>
 <div class="grid2" style="margin-top:12px"><button class="btn primary" id="saveBudgetBtn" type="button">＋ 儲存預算</button><button class="btn" id="notifyBtn" type="button">🔔 開啟通知提醒</button></div>
-<div id="budgetList" style="margin-top:10px"></div>
-</div></details></section><section class="card"><h2>🥧 分類圓餅圖</h2><div class="donutbox"><div class="donut" id="donut"><div class="donutcenter"><b id="chartTotal">$0</b><span class="label">本月支出</span></div></div></div><div class="legend" id="legend"></div></section><section class="card"><details class="collapsible-section"><summary><h2>📈 年度統計 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content"><div class="grid3"><div class="stat"><div class="label">年度收入</div><div class="val income" id="yearIncome">$0</div></div><div class="stat"><div class="label">年度支出</div><div class="val expense" id="yearExpense">$0</div></div><div class="stat"><div class="label">年度淨額</div><div class="val net" id="yearNet">$0</div></div></div><div class="monthgrid" id="yearGrid" style="margin-top:10px"></div></div></details></section><section class="card"><h2>🔎 搜尋紀錄</h2><details class="search-list-collapse"><summary class="btn" style="list-style:none;cursor:pointer;margin-top:8px">展開／收合搜尋與整份紀錄清單</summary><div class="filters" style="margin-top:12px"><input id="search" placeholder="搜尋分類、備註或帳戶"/><select id="accountFilter"><option value="all">全部銀行帳戶</option></select><select id="typeFilter"><option value="all">全部</option><option value="income">收入</option><option value="expense">支出</option></select><select id="categoryFilter"><option value="all">全部分類</option></select><input id="monthFilter" type="month"/></div><button class="btn" id="clearSearch" style="margin-top:10px" type="button">清除搜尋</button><div id="records" style="margin-top:10px"></div></details></section><section class="card">
+</div></details><div id="budgetList" style="margin-top:10px"></div></section><section class="card"><h2>🥧 分類圓餅圖</h2><div class="donutbox"><div class="donut" id="donut"><div class="donutcenter"><b id="chartTotal">$0</b><span class="label">本月支出</span></div></div></div><div class="legend" id="legend"></div></section><section class="card"><details class="collapsible-section"><summary><h2>📈 年度統計 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content"><div class="grid3"><div class="stat"><div class="label">年度收入</div><div class="val income" id="yearIncome">$0</div></div><div class="stat"><div class="label">年度支出</div><div class="val expense" id="yearExpense">$0</div></div><div class="stat"><div class="label">年度淨額</div><div class="val net" id="yearNet">$0</div></div></div><div class="monthgrid" id="yearGrid" style="margin-top:10px"></div></div></details></section><section class="card"><h2>🔎 搜尋紀錄</h2><details class="search-list-collapse"><summary class="btn" style="list-style:none;cursor:pointer;margin-top:8px">展開／收合搜尋與整份紀錄清單</summary><div class="filters" style="margin-top:12px"><input id="search" placeholder="搜尋分類、備註或帳戶"/><select id="accountFilter"><option value="all">全部銀行帳戶</option></select><select id="typeFilter"><option value="all">全部</option><option value="income">收入</option><option value="expense">支出</option></select><select id="categoryFilter"><option value="all">全部分類</option></select><input id="monthFilter" type="month"/></div><button class="btn" id="clearSearch" style="margin-top:10px" type="button">清除搜尋</button><div id="records" style="margin-top:10px"></div></details></section><section class="card">
 <h2>⚙️ 初始餘額</h2>
 <div class="form">
 <div><label>銀行帳戶</label><select id="initialAccount"></select></div>
@@ -422,8 +421,8 @@ function render(){
 function renderTop(){
   var total=0,initialTotal=0;
   for(var i=0;i<data.accounts.length;i++){total+=accountBalance(data.accounts[i].id);initialTotal+=Number(data.accounts[i].initialBalance)||0;}
-  $("total").textContent=money(total);
-  $("initial").textContent=money(initialTotal);
+  $("total").textContent=totalHidden?"••••••":money(total);
+  $("initial").textContent=totalHidden?"••••••":money(initialTotal);
   $("count").textContent=String(data.records.length+data.transfers.length);
   $("monthTitle").textContent=monthLabel(currentMonth);
 }
@@ -750,9 +749,9 @@ function init(){
   var totalHidden=false;
   $("toggleTotalVisibility").addEventListener("click",function(){
     totalHidden=!totalHidden;
-    var el=$("total");
-    if(totalHidden){el.textContent="••••••";this.textContent="👁️ 顯示金額";this.setAttribute("aria-pressed","true");}
-    else{el.textContent=money(data.accounts.reduce(function(sum,a){return sum+accountBalance(a.id);},0));this.textContent="🙈 隱藏金額";this.setAttribute("aria-pressed","false");}
+    var el=$("total"),initialEl=$("initial");
+    if(totalHidden){el.textContent="••••••";initialEl.textContent="••••••";this.textContent="👁️ 顯示金額";this.setAttribute("aria-pressed","true");}
+    else{el.textContent=money(data.accounts.reduce(function(sum,a){return sum+accountBalance(a.id);},0));initialEl.textContent=money(data.accounts.reduce(function(sum,a){return sum+(Number(a.initialBalance)||0);},0));this.textContent="🙈 隱藏金額";this.setAttribute("aria-pressed","false");}
   });
 
   render();
