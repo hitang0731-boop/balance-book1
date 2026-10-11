@@ -43,6 +43,9 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 .modalbg{position:fixed;inset:0;background:#0008;display:none;align-items:flex-end;padding:10px;z-index:20}.modalbg.show{display:flex}.modal{width:min(700px,100%);background:#fff;border-radius:24px;padding:18px;max-height:90vh;overflow:auto}.modalhead{display:flex;justify-content:space-between}.close{border:0;background:#f1f4f8;border-radius:50%;width:42px;height:42px;font-size:22px}
 .toast{position:fixed;left:50%;bottom:25px;transform:translateX(-50%);background:#172033;color:#fff;padding:12px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:.2s;z-index:50}.toast.show{opacity:1}
 @media(max-width:650px){.wrap{padding:12px 10px 55px}.form,.filters{grid-template-columns:1fr}.grid3{grid-template-columns:1fr}.monthgrid{grid-template-columns:1fr 1fr}.card{padding:16px}.big{font-size:39px}}
+
+.search-list-collapse>summary::-webkit-details-marker{display:none}
+.search-list-collapse>summary{width:100%;text-align:center}
 </style>
 </head>
 <body>
@@ -90,15 +93,6 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 <div style="display:flex;align-items:end"><button class="btn primary full" id="addAccountBtn" type="button">＋ 新增帳戶</button></div>
 </div>
 <div id="accountManage" style="margin-top:12px"></div>
-</section><section class="card">
-<h2>⚙️ 初始餘額</h2>
-<div class="form">
-<div><label>銀行帳戶</label><select id="initialAccount"></select></div>
-<div><label>初始餘額</label><input id="initialAmount" inputmode="decimal" step="0.01" type="number"/></div>
-<div><label>初始日期</label><input id="initialDate" type="date"/></div>
-</div>
-<button class="btn primary full" id="saveInitialBtn" style="margin-top:12px" type="button">儲存初始餘額</button>
-<div class="label" style="margin-top:8px;font-size:13px">初始餘額只計入總餘額，不算入月份收入或支出。</div>
 </section><section class="card"><h2>🗓️ 月份總覽</h2><div class="table"><table><thead><tr><th>月份</th><th>收入</th><th>支出</th><th>淨額</th><th>筆數</th></tr></thead><tbody id="monthTable"></tbody></table></div></section><section class="card"><h2>📆 月曆</h2><div class="calendarhead"><div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div></div><div class="calendar" id="calendar"></div></section><section class="card">
 <h2>📅 月份切換</h2>
 <div class="monthnav"><button class="btn" id="prev" type="button">‹</button><div class="monthtitle" id="monthTitle"></div><button class="btn" id="next" type="button">›</button></div>
@@ -139,7 +133,17 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 </div>
 <div class="grid2" style="margin-top:12px"><button class="btn primary" id="saveBudgetBtn" type="button">＋ 儲存預算</button><button class="btn" id="notifyBtn" type="button">🔔 開啟通知提醒</button></div>
 <div id="budgetList" style="margin-top:10px"></div>
-</section><section class="card"><h2>🥧 分類圓餅圖</h2><div class="donutbox"><div class="donut" id="donut"><div class="donutcenter"><b id="chartTotal">$0</b><span class="label">本月支出</span></div></div></div><div class="legend" id="legend"></div></section><section class="card"><h2>📈 年度統計</h2><div class="grid3"><div class="stat"><div class="label">年度收入</div><div class="val income" id="yearIncome">$0</div></div><div class="stat"><div class="label">年度支出</div><div class="val expense" id="yearExpense">$0</div></div><div class="stat"><div class="label">年度淨額</div><div class="val net" id="yearNet">$0</div></div></div><div class="monthgrid" id="yearGrid" style="margin-top:10px"></div></section><section class="card"><h2>🔎 搜尋紀錄</h2><div class="filters"><input id="search" placeholder="搜尋分類、備註或帳戶"/><select id="accountFilter"><option value="all">全部銀行帳戶</option></select><select id="typeFilter"><option value="all">全部</option><option value="income">收入</option><option value="expense">支出</option></select><select id="categoryFilter"><option value="all">全部分類</option></select><input id="monthFilter" type="month"/></div><button class="btn" id="clearSearch" style="margin-top:10px" type="button">清除搜尋</button><div id="records" style="margin-top:10px"></div></section><section class="card">
+</section><section class="card"><h2>🥧 分類圓餅圖</h2><div class="donutbox"><div class="donut" id="donut"><div class="donutcenter"><b id="chartTotal">$0</b><span class="label">本月支出</span></div></div></div><div class="legend" id="legend"></div></section><section class="card"><h2>📈 年度統計</h2><div class="grid3"><div class="stat"><div class="label">年度收入</div><div class="val income" id="yearIncome">$0</div></div><div class="stat"><div class="label">年度支出</div><div class="val expense" id="yearExpense">$0</div></div><div class="stat"><div class="label">年度淨額</div><div class="val net" id="yearNet">$0</div></div></div><div class="monthgrid" id="yearGrid" style="margin-top:10px"></div></section><section class="card"><h2>🔎 搜尋紀錄</h2><details class="search-list-collapse"><summary class="btn" style="list-style:none;cursor:pointer;margin-top:8px">展開／收合搜尋與整份紀錄清單</summary><div class="filters" style="margin-top:12px"><input id="search" placeholder="搜尋分類、備註或帳戶"/><select id="accountFilter"><option value="all">全部銀行帳戶</option></select><select id="typeFilter"><option value="all">全部</option><option value="income">收入</option><option value="expense">支出</option></select><select id="categoryFilter"><option value="all">全部分類</option></select><input id="monthFilter" type="month"/></div><button class="btn" id="clearSearch" style="margin-top:10px" type="button">清除搜尋</button><div id="records" style="margin-top:10px"></div></details></section><section class="card">
+<h2>⚙️ 初始餘額</h2>
+<div class="form">
+<div><label>銀行帳戶</label><select id="initialAccount"></select></div>
+<div><label>初始餘額</label><input id="initialAmount" inputmode="decimal" step="0.01" type="number"/></div>
+<div><label>初始日期</label><input id="initialDate" type="date"/></div>
+</div>
+<button class="btn primary full" id="saveInitialBtn" style="margin-top:12px" type="button">儲存初始餘額</button>
+<div class="label" style="margin-top:8px;font-size:13px">初始餘額只計入總餘額，不算入月份收入或支出。</div>
+</section>
+<section class="card">
 <h2>💾 資料備份</h2>
 <div class="grid2"><button class="btn" id="exportBtn" type="button">匯出 JSON</button><button class="btn" id="backupBtn" type="button">完整備份</button></div>
 <label class="btn" style="display:block;text-align:center;margin-top:10px;color:#2563eb">📥 還原備份<input accept=".json,application/json" id="restoreInput" style="display:none" type="file"/></label>
