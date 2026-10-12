@@ -273,7 +273,8 @@ function renderBudgets(){
   var html="",list=data.budgets.filter(function(b){return b.month===m;});
   for(var i=0;i<list.length;i++){
     var b=list[i],spent=budgetExpense(b.month,b.category),pct=b.amount?spent/b.amount*100:0,bar=Math.min(100,pct),cls=pct>=100?"budgetdanger":(pct>=b.alertPercent?"budgetwarn":"budgetok");
-    html+='<div class="budgetitem '+cls+'"><div class="budgetmeta"><span>'+escapeHtml(b.category)+'｜預算 '+money(b.amount)+'</span><span>'+pct.toFixed(0)+'%</span></div><div class="budgetbar"><div class="budgetfill" style="width:'+bar+'%;background:'+(pct>=100?'#dc3545':(pct>=b.alertPercent?'#f59e0b':'#198754'))+'"></div></div><div class="rmeta">已支出 '+money(spent)+' ／ 剩餘 '+money(Math.max(0,b.amount-spent))+'　提醒 '+b.alertPercent+'%</div><div class="actions"><button type="button" class="btn danger" data-budget-delete="'+escapeHtml(b.id)+'">🗑️ 刪除預算</button></div></div>';
+    var budgetStatus=spent>b.amount?'超出 '+money(spent-b.amount):'剩餘 '+money(b.amount-spent);
+    html+='<div class="budgetitem '+cls+'"><div class="budgetmeta"><span>'+escapeHtml(b.category)+'｜預算 '+money(b.amount)+'</span><span>'+pct.toFixed(0)+'%</span></div><div class="budgetbar"><div class="budgetfill" style="width:'+bar+'%;background:'+(pct>=100?'#dc3545':(pct>=b.alertPercent?'#f59e0b':'#198754'))+'"></div></div><div class="rmeta">已支出 '+money(spent)+' ／ '+budgetStatus+'　提醒 '+b.alertPercent+'%</div><div class="actions"><button type="button" class="btn danger" data-budget-delete="'+escapeHtml(b.id)+'">🗑️ 刪除預算</button></div></div>';
   }
   $("budgetList").innerHTML=html||'<div class="empty">這個月份尚未設定預算</div>';
   var bs=$("budgetList").querySelectorAll("[data-budget-delete]");
