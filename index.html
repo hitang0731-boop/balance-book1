@@ -274,9 +274,22 @@ function renderBudgets(){
   for(var i=0;i<list.length;i++){
     var b=list[i],spent=budgetExpense(b.month,b.category),pct=b.amount?spent/b.amount*100:0,bar=Math.min(100,pct),cls=pct>=100?"budgetdanger":(pct>=b.alertPercent?"budgetwarn":"budgetok");
     var budgetStatus=spent>b.amount?'超出 '+money(spent-b.amount):'剩餘 '+money(b.amount-spent);
-    html+='<div class="budgetitem '+cls+'"><div class="budgetmeta"><span>'+escapeHtml(b.category)+'｜預算 '+money(b.amount)+'</span><span>'+pct.toFixed(0)+'%</span></div><div class="budgetbar"><div class="budgetfill" style="width:'+bar+'%;background:'+(pct>=100?'#dc3545':(pct>=b.alertPercent?'#f59e0b':'#198754'))+'"></div></div><div class="rmeta">已支出 '+money(spent)+' ／ '+budgetStatus+'　提醒 '+b.alertPercent+'%</div><div class="actions"><button type="button" class="btn danger" data-budget-delete="'+escapeHtml(b.id)+'">🗑️ 刪除預算</button></div></div>';
+    html+='<div class="budgetitem '+cls+'"><button type="button" class="budget-detail-toggle" data-budget-details="'+escapeHtml(b.id)+'" data-budget-month="'+escapeHtml(b.month)+'" data-budget-category="'+escapeHtml(b.category)+'" aria-expanded="false" style="display:block;width:100%;text-align:left;background:transparent;border:0;color:inherit;padding:0;cursor:pointer"><div class="budgetmeta"><span>'+escapeHtml(b.category)+'｜預算 '+money(b.amount)+'</span><span>'+pct.toFixed(0)+'%</span></div><div class="budgetbar"><div class="budgetfill" style="width:'+bar+'%;background:'+(pct>=100?'#dc3545':(pct>=b.alertPercent?'#f59e0b':'#198754'))+'"></div></div><div class="rmeta">已支出 '+money(spent)+' ／ '+budgetStatus+'　提醒 '+b.alertPercent+'%<br>👆 點擊查看消費明細</div></button><div id="budget-details-'+escapeHtml(b.id)+'" class="budget-expense-details" hidden></div><div class="actions"><button type="button" class="btn danger" data-budget-delete="'+escapeHtml(b.id)+'">🗑️ 刪除預算</button></div></div>';
   }
   $("budgetList").innerHTML=html||'<div class="empty">這個月份尚未設定預算</div>';
+  var detailBtns=$("budgetList").querySelectorAll("[data-budget-details]");
+  for(var d=0;d<detailBtns.length;d++)detailBtns[d].addEventListener("click",function(){
+    var id=this.getAttribute("data-budget-details"),month=this.getAttribute("data-budget-month"),category=this.getAttribute("data-budget-category"),panel=$("budget-details-"+id);
+    if(!panel)return;
+    var opening=panel.hidden;
+    if(opening){
+      var rows=data.records.filter(function(r){return r.type==="expense"&&String(r.date||"").slice(0,7)===month&&r.category===category;}).sort(function(a,b){return String(b.date).localeCompare(String(a.date));});
+      var total=sum(rows,"expense"),details='<div style="margin-top:12px;padding:12px;border-radius:12px;background:rgba(255,255,255,.75)"><b>🧾 '+escapeHtml(month)+'｜'+escapeHtml(category)+' 消費明細</b><div class="rmeta">共 '+rows.length+' 筆，合計 '+money(total)+'</div>';
+      if(!rows.length)details+='<div class="empty">這個月份尚無此分類的支出紀錄。</div>';
+      for(var q=0;q<rows.length;q++){var r=rows[q];details+='<div class="day-record"><div><b>📅 '+escapeHtml(r.date||"")+'</b><div class="day-record-note">'+escapeHtml(accountName(r.accountId))+(r.note?' · '+escapeHtml(r.note):'')+'</div></div><b class="expense">−'+money(r.amount)+'</b></div>';}
+      details+='</div>';panel.innerHTML=details;panel.hidden=false;this.setAttribute("aria-expanded","true");
+    }else{panel.hidden=true;this.setAttribute("aria-expanded","false");}
+  });
   var bs=$("budgetList").querySelectorAll("[data-budget-delete]");
   for(var j=0;j<bs.length;j++)bs[j].addEventListener("click",function(){deleteBudget(this.getAttribute("data-budget-delete"));});
 }
