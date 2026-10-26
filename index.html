@@ -90,7 +90,7 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 
 <section class="card">
 <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div class="label">目前總餘額</div><button class="btn" id="toggleTotalVisibility" type="button" aria-pressed="true">👁️ 顯示金額</button></div><div class="big" id="total" data-real-value="$0">$0</div>
-<div class="grid2"><div class="stat"><div class="label">初始餘額</div><div class="val" id="initial">$0</div></div><div class="stat"><div class="label">紀錄筆數</div><div class="val" id="count">0</div></div></div>
+<div class="stat"><div class="label">初始餘額</div><div class="val" id="initial">$0</div></div><div style="margin-top:12px"><div class="label" style="margin-bottom:8px">📅 各月份紀錄筆數（收入、支出及轉帳）</div><div id="monthRecordCounts" class="monthgrid"><div class="empty">尚無紀錄</div></div></div>
 </section><section class="card">
 <details class="collapsible-section"><summary><h2>🏦 銀行帳戶 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content">
 <div class="label" style="margin-bottom:10px">每個帳戶會各自計算「初始餘額＋收入－支出」。</div>
@@ -439,6 +439,12 @@ function renderTop(){
   $("total").textContent=totalHidden?"••••••":money(total);
   $("initial").textContent=totalHidden?"••••••":money(initialTotal);
   $("count").textContent=String(data.records.length+data.transfers.length);
+  var counts={};
+  data.records.forEach(function(r){var m=String(r.date||"").slice(0,7);if(m)counts[m]=(counts[m]||0)+1;});
+  data.transfers.forEach(function(t){var m=String(t.date||"").slice(0,7);if(m)counts[m]=(counts[m]||0)+1;});
+  var months=Object.keys(counts).sort().reverse(),countHtml="";
+  for(var j=0;j<months.length;j++)countHtml+='<div class="monthbox"><div class="label">'+escapeHtml(monthLabel(months[j]))+'</div><div style="font-size:20px;font-weight:900;margin-top:4px">'+counts[months[j]]+' <span style="font-size:13px;font-weight:500">筆</span></div></div>';
+  $("monthRecordCounts").innerHTML=countHtml||'<div class="empty">尚無紀錄</div>';
   $("monthTitle").textContent=monthLabel(currentMonth);
 }
 function renderMonth(){
