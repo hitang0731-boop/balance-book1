@@ -438,7 +438,6 @@ function renderTop(){
   for(var i=0;i<data.accounts.length;i++){total+=accountBalance(data.accounts[i].id);initialTotal+=Number(data.accounts[i].initialBalance)||0;}
   $("total").textContent=totalHidden?"••••••":money(total);
   $("initial").textContent=totalHidden?"••••••":money(initialTotal);
-  $("count").textContent=String(data.records.length+data.transfers.length);
   var counts={};
   data.records.forEach(function(r){var m=String(r.date||"").slice(0,7);if(m)counts[m]=(counts[m]||0)+1;});
   data.transfers.forEach(function(t){var m=String(t.date||"").slice(0,7);if(m)counts[m]=(counts[m]||0)+1;});
