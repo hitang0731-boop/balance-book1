@@ -90,7 +90,7 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 
 <section class="card">
 <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div class="label">目前總餘額</div><button class="btn" id="toggleTotalVisibility" type="button" aria-pressed="true">👁️ 顯示金額</button></div><div class="big" id="total" data-real-value="$0">$0</div>
-<div class="stat"><div class="label">初始餘額</div><div class="val" id="initial">$0</div></div><div style="margin-top:12px"><div class="label" style="margin-bottom:8px">📅 各月份紀錄筆數（收入、支出及轉帳）</div><div id="monthRecordCounts" class="monthgrid"><div class="empty">尚無紀錄</div></div></div>
+<div class="stat"><div class="label">初始餘額</div><div class="val" id="initial">$0</div></div><details class="collapsible-section" style="margin-top:12px"><summary><h3 style="margin:0;font-size:16px">📅 各月份紀錄筆數（收入、支出及轉帳） <span class="collapse-hint">（點擊收合／展開）</span></h3></summary><div class="collapsible-content"><div id="monthRecordCounts" class="monthgrid"><div class="empty">尚無紀錄</div></div></div></details>
 </section><section class="card">
 <details class="collapsible-section"><summary><h2>🏦 銀行帳戶 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content">
 <div class="label" style="margin-bottom:10px">每個帳戶會各自計算「初始餘額＋收入－支出」。</div>
