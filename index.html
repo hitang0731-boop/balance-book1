@@ -138,6 +138,9 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 <details class="collapsible-section" open><summary><h2>💳 信用卡管理 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content">
 <div class="grid3"><div class="stat"><div class="label">信用卡未繳欠款</div><div class="val expense" id="cardDebtTotal">$0</div></div><div class="stat"><div class="label">信用額度總計</div><div class="val" id="cardLimitTotal">$0</div></div><div class="stat"><div class="label">可用額度總計</div><div class="val income" id="cardAvailableTotal">$0</div></div></div>
 <h3 style="margin:16px 0 8px">我的信用卡</h3><div id="creditCardList"></div>
+<h3 style="margin:18px 0 8px">🧾 當期帳單與消費明細</h3><div class="form"><div><label>查看信用卡</label><select id="detailCardSelect"></select></div><div><label>帳單月份</label><input id="statementMonth" type="month"/></div></div><div id="cardStatementSummary" style="margin-top:10px"></div><div id="cardConsumerDetails" style="margin-top:10px"></div>
+<h3 style="margin:18px 0 8px">↩️ 登記退款</h3><div class="form"><div><label>信用卡</label><select id="refundCardSelect"></select></div><div><label>退款日期</label><input id="refundDate" type="date"/></div><div><label>退款金額</label><input id="refundAmount" type="number" min="0.01" step="0.01" placeholder="例如 500"/></div><div><label>分類</label><select id="refundCategory"><option>餐飲</option><option>交通</option><option>購物</option><option>日用品</option><option>電信</option><option>保險</option><option>其他</option></select></div><div style="grid-column:1/-1"><label>退款備註</label><input id="refundNote" placeholder="例如：退回衣服款項"/></div></div><button class="btn primary full" id="addRefundBtn" style="margin-top:10px" type="button">＋ 登記退款</button>
+<h3 style="margin:18px 0 8px">🧩 新增分期消費</h3><div class="label" style="margin-bottom:8px">分期消費會以總金額計入信用卡未償欠款；當期帳單則依期數顯示每期應繳金額。</div><div class="form"><div><label>信用卡</label><select id="installmentCardSelect"></select></div><div><label>消費日期</label><input id="installmentDate" type="date"/></div><div><label>消費分類</label><select id="installmentCategory"></select></div><div><label>分期總金額</label><input id="installmentAmount" type="number" min="0.01" step="0.01" placeholder="例如 12000"/></div><div><label>分期期數</label><select id="installmentMonths"><option value="3">3 期</option><option value="6">6 期</option><option value="12" selected>12 期</option><option value="18">18 期</option><option value="24">24 期</option><option value="36">36 期</option></select></div><div><label>備註</label><input id="installmentNote" placeholder="例如：手機分期"/></div></div><button class="btn primary full" id="addInstallmentBtn" style="margin-top:10px" type="button">＋ 新增分期消費</button>
 <h3 style="margin:18px 0 8px">＋ 新增信用卡</h3><div class="form"><div><label>信用卡名稱</label><input id="newCardName" placeholder="例如：國泰 Cube 卡"/></div><div><label>信用額度</label><input id="newCardLimit" type="number" min="0" step="1" inputmode="decimal" placeholder="例如 100000"/></div><div><label>結帳日（每月）</label><input id="newCardStatementDay" type="number" min="1" max="31" value="20"/></div><div><label>繳款日（每月）</label><input id="newCardDueDay" type="number" min="1" max="31" value="10"/></div></div><button class="btn primary full" id="addCreditCardBtn" style="margin-top:10px" type="button">＋ 新增信用卡</button>
 <h3 style="margin:20px 0 8px">💸 繳信用卡費</h3><div class="label" style="margin-bottom:10px">繳款會扣除選定的銀行帳戶餘額，並減少信用卡欠款，不會重複計入支出。</div><div class="form"><div><label>信用卡</label><select id="payCardSelect"></select></div><div><label>扣款銀行帳戶</label><select id="payBankSelect"></select></div><div><label>繳款日期</label><input id="cardPaymentDate" type="date"/></div><div><label>繳款金額</label><input id="cardPaymentAmount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="例如 5000"/></div><div style="grid-column:1/-1"><label>備註</label><input id="cardPaymentNote" placeholder="例如 10 月信用卡帳單"/></div></div><button class="btn primary full" id="payCreditCardBtn" style="margin-top:10px" type="button">確認繳款</button><div id="cardPaymentList" style="margin-top:12px"></div>
 </div></details></section><section class="card">
@@ -200,7 +203,7 @@ var totalHidden=true;
 var KEY="balance_book_shared_category_v1";
 var CATS=["餐飲","交通","娛樂","購物","日用品","住房","醫療","電信","保險","薪資","獎金","兼職","投資","其他"];
 var COLORS=["#2563eb","#ef4444","#10b981","#f59e0b","#8b5cf6","#ec4899","#14b8a6","#f97316","#06b6d4","#84cc16","#6366f1","#64748b"];
-var data={accounts:[],records:[],transfers:[],budgets:[],creditCards:[],cardPayments:[]};
+var data={accounts:[],records:[],transfers:[],budgets:[],creditCards:[],cardPayments:[],cardRefunds:[]};
 var currentMonth="";
 var currentType="income";
 var rankType="expense";
@@ -257,7 +260,7 @@ function loadData(){
       }
       var first=data.accounts[0].id;
       data.records=Array.isArray(x.records)?x.records.map(function(r){
-        return {id:r.id||String(Date.now())+String(Math.random()),type:r.type==="expense"?"expense":"income",date:r.date||today(),category:r.category||"其他",amount:Math.abs(Number(r.amount)||0),note:r.note||"",accountId:r.accountId||first,paymentMethod:r.paymentMethod==="card"?"card":"bank",cardId:r.cardId||""};
+        return {id:r.id||String(Date.now())+String(Math.random()),type:r.type==="expense"?"expense":"income",date:r.date||today(),category:r.category||"其他",amount:Math.abs(Number(r.amount)||0),note:r.note||"",accountId:r.accountId||first,paymentMethod:r.paymentMethod==="card"?"card":"bank",cardId:r.cardId||"",installmentMonths:Math.max(0,Number(r.installmentMonths)||0),installmentStartMonth:r.installmentStartMonth||String(r.date||today()).slice(0,7)};
       }):[];
       data.budgets=Array.isArray(x.budgets)?x.budgets.map(function(b){return {id:b.id||("bud_"+Date.now()+Math.random()),month:b.month||today().slice(0,7),category:b.category||"餐飲",amount:Math.abs(Number(b.amount)||0),alertPercent:Number(b.alertPercent)||80,enabled:b.enabled!==false};}).filter(function(b){return b.amount>0;}):[];
       data.budgets=Array.isArray(x.budgets)?x.budgets.map(function(b){return {id:b.id||("bud_"+Date.now()+Math.random()),month:b.month||today().slice(0,7),category:b.category||"餐飲",amount:Math.abs(Number(b.amount)||0),alertPercent:Number(b.alertPercent)||80,enabled:b.enabled!==false};}).filter(function(b){return b.amount>0;}):[];
@@ -268,6 +271,7 @@ function loadData(){
       data.creditCards=Array.isArray(x.creditCards)?x.creditCards.map(function(c){
         return {id:c.id||("card_"+Date.now()+Math.random()),name:c.name||"信用卡",limit:Math.max(0,Number(c.limit)||0),statementDay:Number(c.statementDay)||20,dueDay:Number(c.dueDay)||10};
       }):[];
+      data.cardRefunds=Array.isArray(x.cardRefunds)?x.cardRefunds.map(function(rf){return {id:rf.id||("rf_"+Date.now()+Math.random()),cardId:rf.cardId||"",date:rf.date||today(),amount:Math.abs(Number(rf.amount)||0),note:rf.note||"",category:rf.category||"退款"};}).filter(function(rf){return rf.amount>0;}):[];
       data.cardPayments=Array.isArray(x.cardPayments)?x.cardPayments.map(function(p){
         return {id:p.id||("cp_"+Date.now()+Math.random()),cardId:p.cardId||"",accountId:p.accountId||first,date:p.date||today(),amount:Math.abs(Number(p.amount)||0),note:p.note||""};
       }).filter(function(p){return p.amount>0;}):[];
@@ -282,6 +286,7 @@ function loadData(){
   if(!Array.isArray(data.budgets)) data.budgets=[];
   if(!Array.isArray(data.creditCards)) data.creditCards=[];
   if(!Array.isArray(data.cardPayments)) data.cardPayments=[];
+  if(!Array.isArray(data.cardRefunds)) data.cardRefunds=[];
   var firstId=data.accounts[0].id;
   for(var i=0;i<data.records.length;i++) if(!data.records[i].accountId) data.records[i].accountId=firstId;
 }
@@ -452,11 +457,14 @@ function renderAccountDetail(){
 function cardById(id){for(var i=0;i<data.creditCards.length;i++)if(String(data.creditCards[i].id)===String(id))return data.creditCards[i];return null;}
 function cardPurchases(id){return data.records.filter(function(r){return r.type==="expense"&&r.paymentMethod==="card"&&String(r.cardId)===String(id);});}
 function cardPayments(id){return data.cardPayments.filter(function(p){return String(p.cardId)===String(id);});}
-function cardOutstanding(id){return Math.max(0,sum(cardPurchases(id))-sum(cardPayments(id)));}
+function cardRefundsFor(id){return data.cardRefunds.filter(function(r){return String(r.cardId)===String(id);});}
+function cardOutstanding(id){return Math.max(0,sum(cardPurchases(id))-sum(cardRefundsFor(id))-sum(cardPayments(id)));}
+function statementAmount(id,month){var purchases=cardPurchases(id).filter(function(r){var m=String(r.date).slice(0,7);if(Number(r.installmentMonths)>0){var start=r.installmentStartMonth||m;var diff=(Number(month.slice(0,4))-Number(start.slice(0,4)))*12+Number(month.slice(5,7))-Number(start.slice(5,7));return diff>=0&&diff<Number(r.installmentMonths);}return m===month;}).reduce(function(t,r){return t+(Number(r.installmentMonths)>0?Math.ceil((Number(r.amount)/Number(r.installmentMonths))*100)/100:Number(r.amount)||0);},0);var refunds=sum(cardRefundsFor(id).filter(function(r){return String(r.date).slice(0,7)===month;}));return Math.max(0,purchases-refunds);}
 function cardAvailable(id){var c=cardById(id);return Math.max(0,(Number(c&&c.limit)||0)-cardOutstanding(id));}
 function fillCreditCardSelects(){
   var opts=data.creditCards.map(function(c){return '<option value="'+escapeHtml(c.id)+'">'+escapeHtml(c.name)+'</option>';}).join("");
-  ["purchaseCardSelect","payCardSelect","editCardSelect"].forEach(function(id){var el=$(id);if(!el)return;var old=el.value;el.innerHTML=opts||'<option value="">尚未新增信用卡</option>';if(data.creditCards.some(function(c){return String(c.id)===String(old);}))el.value=old;});
+  ["purchaseCardSelect","payCardSelect","editCardSelect","detailCardSelect","refundCardSelect","installmentCardSelect"].forEach(function(id){var el=$(id);if(!el)return;var old=el.value;el.innerHTML=opts||'<option value="">尚未新增信用卡</option>';if(data.creditCards.some(function(c){return String(c.id)===String(old);}))el.value=old;});
+  var catOpts=CATS.map(function(c){return '<option value="'+escapeHtml(c)+'">'+escapeHtml(c)+'</option>';}).join("");["installmentCategory"].forEach(function(id){var el=$(id);if(el)el.innerHTML=catOpts;});
   var bankOpts=data.accounts.map(function(a){return '<option value="'+escapeHtml(a.id)+'">'+escapeHtml(a.name)+'</option>';}).join("");
   var bank=$("payBankSelect"),oldBank=bank.value;bank.innerHTML=bankOpts;if(data.accounts.some(function(a){return String(a.id)===String(oldBank);}))bank.value=oldBank;
 }
@@ -472,10 +480,23 @@ function renderCreditCards(){
   $("creditCardList").innerHTML=html||'<div class="empty">尚未新增信用卡，請填寫下方資料新增。</div>';
   var payments=data.cardPayments.slice().sort(function(a,b){return String(b.date).localeCompare(String(a.date));}).slice(0,8),ph="";
   for(var j=0;j<payments.length;j++){var pay=payments[j],card=cardById(pay.cardId);ph+='<div class="record"><div style="padding:12px"><div style="display:flex;justify-content:space-between;gap:8px"><b>'+escapeHtml(card?card.name:"已刪除的信用卡")+'｜繳款 '+escapeHtml(pay.date)+'</b><b class="expense">-'+money(pay.amount)+'</b></div><div class="rmeta">扣款帳戶：'+escapeHtml(accountName(pay.accountId))+(pay.note?'・'+escapeHtml(pay.note):'')+'</div><div class="actions"><button class="btn danger" type="button" data-delete-card-payment="'+escapeHtml(pay.id)+'">刪除此繳款</button></div></div></div>';}
+  renderCardStatement();
   $("cardPaymentList").innerHTML=payments.length?'<h3 style="font-size:16px">最近繳款紀錄</h3>'+ph:"";
   var del=$("creditCardList").querySelectorAll("[data-delete-card]");for(var k=0;k<del.length;k++)del[k].addEventListener("click",function(){deleteCreditCard(this.getAttribute("data-delete-card"));});
   var dels=$("cardPaymentList").querySelectorAll("[data-delete-card-payment]");for(var z=0;z<dels.length;z++)dels[z].addEventListener("click",function(){deleteCardPayment(this.getAttribute("data-delete-card-payment"));});
 }
+function renderCardStatement(){
+  var sel=$("detailCardSelect"),monthEl=$("statementMonth");if(!sel||!monthEl)return;var cardId=sel.value||((data.creditCards[0]||{}).id||"");if(data.creditCards.length&&!data.creditCards.some(function(c){return String(c.id)===String(cardId);}))cardId=data.creditCards[0].id;
+  if(sel.value!==cardId)sel.value=cardId;var month=monthEl.value||currentMonth||today().slice(0,7);if(!monthEl.value)monthEl.value=month;
+  if(!cardId){$("cardStatementSummary").innerHTML='<div class="empty">請先新增信用卡。</div>';$("cardConsumerDetails").innerHTML="";return;}
+  var c=cardById(cardId),bill=statementAmount(cardId,month),refunds=cardRefundsFor(cardId).filter(function(r){return String(r.date).slice(0,7)===month;}),rows=cardPurchases(cardId).filter(function(r){if(Number(r.installmentMonths)>0){var start=r.installmentStartMonth||String(r.date).slice(0,7);var diff=(Number(month.slice(0,4))-Number(start.slice(0,4)))*12+Number(month.slice(5,7))-Number(start.slice(5,7));return diff>=0&&diff<Number(r.installmentMonths);}return String(r.date).slice(0,7)===month;}).map(function(r){return {date:r.date,amount:r.amount,note:r.note,category:r.category,kind:Number(r.installmentMonths)>0?"分期消費（總額）":"刷卡消費",id:r.id,months:r.installmentMonths||0};}).concat(refunds.map(function(r){return {date:r.date,amount:-r.amount,note:r.note,category:r.category,kind:"退款",id:r.id};})).sort(function(a,b){return String(b.date).localeCompare(String(a.date));});
+  $("cardStatementSummary").innerHTML='<div class="budgetitem"><b>'+escapeHtml(c?c.name:"信用卡")+'｜'+escapeHtml(monthLabel(month))+' 當期帳單</b><div class="val expense" style="font-size:24px;margin-top:8px">'+money(bill)+'</div><div class="label">本期帳單估算：當月一般消費＋分期每期金額－當月退款。實際帳單可能因銀行入帳日、利息或手續費不同而有差異。</div></div>';
+  var html="";for(var i=0;i<rows.length;i++){var r=rows[i];html+='<div class="record"><div style="padding:10px 12px"><div style="display:flex;justify-content:space-between;gap:8px"><b>'+escapeHtml(r.kind)+'｜'+escapeHtml(r.date)+'</b><b class="'+(r.amount<0?'income':'expense')+'">'+(r.amount<0?'+':'−')+money(Math.abs(r.amount))+'</b></div><div class="rmeta">'+escapeHtml(r.category||"")+(r.months?'・'+r.months+' 期分期':'')+(r.note?'・'+escapeHtml(r.note):'')+'</div>'+(r.kind==="退款"?'<div class="actions"><button class="btn danger" type="button" data-delete-refund="'+escapeHtml(r.id)+'">刪除退款</button></div>':'')+'</div></div>';}
+  $("cardConsumerDetails").innerHTML='<h4>消費明細與退款</h4>'+(html||'<div class="empty">這張卡在所選月份尚無明細。</div>');var dels=$("cardConsumerDetails").querySelectorAll("[data-delete-refund]");for(var j=0;j<dels.length;j++)dels[j].addEventListener("click",function(){deleteRefund(this.getAttribute("data-delete-refund"));});
+}
+function addRefund(){var cardId=$("refundCardSelect").value,date=$("refundDate").value,amount=Number($("refundAmount").value),category=$("refundCategory").value,note=$("refundNote").value.trim();if(!cardById(cardId)){showToast("請先選擇信用卡");return;}if(!date||!isFinite(amount)||amount<=0){showToast("請輸入有效退款日期與金額");return;}data.cardRefunds.push({id:"rf_"+Date.now()+"_"+Math.random().toString(36).slice(2),cardId:cardId,date:date,amount:amount,category:category,note:note});currentMonth=date.slice(0,7);safeSave();$("refundAmount").value="";$("refundNote").value="";render();showToast("退款已登記");}
+function deleteRefund(id){if(!window.confirm("確定刪除這筆退款？信用卡欠款與帳單會重新計算。"))return;data.cardRefunds=data.cardRefunds.filter(function(r){return String(r.id)!==String(id);});safeSave();render();showToast("退款已刪除");}
+function addInstallment(){var cardId=$("installmentCardSelect").value,date=$("installmentDate").value,category=$("installmentCategory").value,amount=Number($("installmentAmount").value),months=Number($("installmentMonths").value),note=$("installmentNote").value.trim();if(!cardById(cardId)){showToast("請先選擇信用卡");return;}if(!date||!isFinite(amount)||amount<=0||months<2){showToast("請確認日期、總金額及分期期數");return;}data.records.push({id:"inst_"+Date.now()+"_"+Math.random().toString(36).slice(2),type:"expense",date:date,category:category,amount:amount,note:(note?note+"｜":"")+"分期總額 "+months+" 期",accountId:data.accounts[0].id,paymentMethod:"card",cardId:cardId,installmentMonths:months,installmentStartMonth:date.slice(0,7)});currentMonth=date.slice(0,7);safeSave();$("installmentAmount").value="";$("installmentNote").value="";render();showToast("分期消費已新增");}
 function addCreditCard(){
   var name=$("newCardName").value.trim(),limit=Number($("newCardLimit").value),sd=Number($("newCardStatementDay").value),dd=Number($("newCardDueDay").value);
   if(!name){showToast("請輸入信用卡名稱");return;}if(!isFinite(limit)||limit<=0){showToast("請輸入大於 0 的信用額度");return;}if(sd<1||sd>31||dd<1||dd>31){showToast("結帳日與繳款日請填 1 到 31 日");return;}
@@ -776,7 +797,7 @@ function deleteRecord(id){
   safeSave();render();showToast("紀錄已刪除");
 }
 function downloadJSON(name){
-  var blob=new Blob([JSON.stringify({version:6,exportedAt:new Date().toISOString(),accounts:data.accounts,records:data.records,transfers:data.transfers,budgets:data.budgets,creditCards:data.creditCards,cardPayments:data.cardPayments},null,2)],{type:"application/json"});
+  var blob=new Blob([JSON.stringify({version:6,exportedAt:new Date().toISOString(),accounts:data.accounts,records:data.records,transfers:data.transfers,budgets:data.budgets,creditCards:data.creditCards,cardPayments:data.cardPayments,cardRefunds:data.cardRefunds},null,2)],{type:"application/json"});
   var url=URL.createObjectURL(blob),a=document.createElement("a");
   a.href=url;a.download=name;document.body.appendChild(a);a.click();document.body.removeChild(a);
   setTimeout(function(){URL.revokeObjectURL(url);},1000);
@@ -800,7 +821,7 @@ function restoreFile(file){
         data.accounts=[{id:"acc_default",name:"未分類帳戶",initialBalance:Number(x.initialBalance)||0,initialDate:x.initialDate||today()}];
       }
       var first=data.accounts[0].id;
-      data.records=x.records.map(function(r){return {id:r.id||String(Date.now())+String(Math.random()),type:r.type==="expense"?"expense":"income",date:r.date||today(),category:r.category||"其他",amount:Math.abs(Number(r.amount)||0),note:r.note||"",accountId:r.accountId||first,paymentMethod:r.paymentMethod==="card"?"card":"bank",cardId:r.cardId||""};});
+      data.records=x.records.map(function(r){return {id:r.id||String(Date.now())+String(Math.random()),type:r.type==="expense"?"expense":"income",date:r.date||today(),category:r.category||"其他",amount:Math.abs(Number(r.amount)||0),note:r.note||"",accountId:r.accountId||first,paymentMethod:r.paymentMethod==="card"?"card":"bank",cardId:r.cardId||"",installmentMonths:Math.max(0,Number(r.installmentMonths)||0),installmentStartMonth:r.installmentStartMonth||String(r.date||today()).slice(0,7)};});
       for(var i=0;i<data.records.length;i++)if(!accountById(data.records[i].accountId))data.records[i].accountId=first;
       data.budgets=Array.isArray(x.budgets)?x.budgets.map(function(b){return {id:b.id||("bud_"+Date.now()+Math.random()),month:b.month||today().slice(0,7),category:b.category||"餐飲",amount:Math.abs(Number(b.amount)||0),alertPercent:Number(b.alertPercent)||80,enabled:b.enabled!==false};}).filter(function(b){return b.amount>0;}):[];
       data.transfers=Array.isArray(x.transfers)?x.transfers.map(function(t){return {id:t.id||String(Date.now())+String(Math.random()),fromAccountId:t.fromAccountId||first,toAccountId:t.toAccountId||first,date:t.date||today(),amount:Math.abs(Number(t.amount)||0),note:t.note||""};}).filter(function(t){return String(t.fromAccountId)!==String(t.toAccountId)&&t.amount>0;}):[];
@@ -809,6 +830,7 @@ function restoreFile(file){
         if(!accountById(data.transfers[j].toAccountId))data.transfers[j].toAccountId=first;
       }
       data.creditCards=Array.isArray(x.creditCards)?x.creditCards.map(function(c){return {id:c.id||("card_"+Date.now()+Math.random()),name:c.name||"信用卡",limit:Math.max(0,Number(c.limit)||0),statementDay:Number(c.statementDay)||20,dueDay:Number(c.dueDay)||10};}):(Array.isArray(data.creditCards)?data.creditCards:[]);
+      data.cardRefunds=Array.isArray(x.cardRefunds)?x.cardRefunds.map(function(rf){return {id:rf.id||("rf_"+Date.now()+Math.random()),cardId:rf.cardId||"",date:rf.date||today(),amount:Math.abs(Number(rf.amount)||0),note:rf.note||"",category:rf.category||"退款"};}).filter(function(rf){return rf.amount>0;}):(Array.isArray(data.cardRefunds)?data.cardRefunds:[]);
       data.cardPayments=Array.isArray(x.cardPayments)?x.cardPayments.map(function(p){return {id:p.id||("cp_"+Date.now()+Math.random()),cardId:p.cardId||"",accountId:p.accountId||first,date:p.date||today(),amount:Math.abs(Number(p.amount)||0),note:p.note||""};}).filter(function(p){return p.amount>0;}):(Array.isArray(data.cardPayments)?data.cardPayments:[]);
       for(var q=0;q<data.cardPayments.length;q++){if(!accountById(data.cardPayments[q].accountId))data.cardPayments[q].accountId=first;}
       if(!safeSave()) throw new Error("save_failed");
@@ -836,6 +858,9 @@ function init(){
 
   $("date").value=today();
   $("cardPaymentDate").value=today();
+  $("refundDate").value=today();
+  $("installmentDate").value=today();
+  $("statementMonth").value=today().slice(0,7);
   $("transferDate").value=today();
   $("transferFrom").value=data.accounts[0].id;
   $("transferTo").value=data.accounts.length>1?data.accounts[1].id:data.accounts[0].id;
@@ -850,6 +875,10 @@ function init(){
   $("addBtn").addEventListener("click",addRecord);
   $("addCreditCardBtn").addEventListener("click",addCreditCard);
   $("payCreditCardBtn").addEventListener("click",payCreditCard);
+  $("addRefundBtn").addEventListener("click",addRefund);
+  $("addInstallmentBtn").addEventListener("click",addInstallment);
+  $("detailCardSelect").addEventListener("change",renderCardStatement);
+  $("statementMonth").addEventListener("change",renderCardStatement);
   $("paymentMethod").addEventListener("change",function(){var show=currentType==="expense"&&this.value==="card";$("purchaseCardWrap").style.display=show?"block":"none";});
   $("transferBtn").addEventListener("click",addTransfer);
   $("saveInitialBtn").addEventListener("click",saveInitial);
