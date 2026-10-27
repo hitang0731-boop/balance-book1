@@ -808,8 +808,8 @@ function restoreFile(file){
         if(!accountById(data.transfers[j].fromAccountId))data.transfers[j].fromAccountId=first;
         if(!accountById(data.transfers[j].toAccountId))data.transfers[j].toAccountId=first;
       }
-      data.creditCards=Array.isArray(x.creditCards)?x.creditCards.map(function(c){return {id:c.id||("card_"+Date.now()+Math.random()),name:c.name||"信用卡",limit:Math.max(0,Number(c.limit)||0),statementDay:Number(c.statementDay)||20,dueDay:Number(c.dueDay)||10};}):[];
-      data.cardPayments=Array.isArray(x.cardPayments)?x.cardPayments.map(function(p){return {id:p.id||("cp_"+Date.now()+Math.random()),cardId:p.cardId||"",accountId:p.accountId||first,date:p.date||today(),amount:Math.abs(Number(p.amount)||0),note:p.note||""};}).filter(function(p){return p.amount>0;}):[];
+      data.creditCards=Array.isArray(x.creditCards)?x.creditCards.map(function(c){return {id:c.id||("card_"+Date.now()+Math.random()),name:c.name||"信用卡",limit:Math.max(0,Number(c.limit)||0),statementDay:Number(c.statementDay)||20,dueDay:Number(c.dueDay)||10};}):(Array.isArray(data.creditCards)?data.creditCards:[]);
+      data.cardPayments=Array.isArray(x.cardPayments)?x.cardPayments.map(function(p){return {id:p.id||("cp_"+Date.now()+Math.random()),cardId:p.cardId||"",accountId:p.accountId||first,date:p.date||today(),amount:Math.abs(Number(p.amount)||0),note:p.note||""};}).filter(function(p){return p.amount>0;}):(Array.isArray(data.cardPayments)?data.cardPayments:[]);
       for(var q=0;q<data.cardPayments.length;q++){if(!accountById(data.cardPayments[q].accountId))data.cardPayments[q].accountId=first;}
       if(!safeSave()) throw new Error("save_failed");
       currentAccountId=null;fillAccounts();currentMonth=today().slice(0,7);render();showToast("資料已還原");
