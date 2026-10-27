@@ -90,7 +90,7 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 
 <section class="card">
 <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div class="label">目前總餘額</div><button class="btn" id="toggleTotalVisibility" type="button" aria-pressed="true">👁️ 顯示金額</button></div><div class="big" id="total" data-real-value="$0">$0</div>
-<div class="stat"><div class="label">初始餘額</div><div class="val" id="initial">$0</div></div><details class="collapsible-section" style="margin-top:12px"><summary><h3 style="margin:0;font-size:16px">📅 各月份紀錄筆數（收入、支出及轉帳） <span class="collapse-hint">（點擊收合／展開）</span></h3></summary><div class="collapsible-content"><div id="monthRecordCounts" class="monthgrid"><div class="empty">尚無紀錄</div></div></div></details>
+<div class="stat"><div class="label">初始餘額</div><div class="val" id="initial">$0</div></div><details class="collapsible-section" style="margin-top:12px"><summary><h3 style="margin:0;font-size:16px">📅 各月份紀錄筆數（收入、支出、轉帳及信用卡繳款） <span class="collapse-hint">（點擊收合／展開）</span></h3></summary><div class="collapsible-content"><div id="monthRecordCounts" class="monthgrid"><div class="empty">尚無紀錄</div></div></div></details>
 </section><section class="card">
 <details class="collapsible-section"><summary><h2>🏦 銀行帳戶 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content">
 <div class="label" style="margin-bottom:10px">每個帳戶會各自計算「初始餘額＋收入－支出」。</div>
@@ -100,7 +100,15 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 <div style="display:flex;align-items:end"><button class="btn primary full" id="addAccountBtn" type="button">＋ 新增帳戶</button></div>
 </div>
 <div id="accountManage" style="margin-top:12px"></div>
-</div></details></section><section class="card"><details class="collapsible-section"><summary><h2>🗓️ 月份總覽 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content"><div class="table"><table><thead><tr><th>月份</th><th>收入</th><th>支出</th><th>淨額</th><th>筆數</th></tr></thead><tbody id="monthTable"></tbody></table></div></div></details></section><section class="card"><h2>📆 月曆</h2><div class="calendarhead"><div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div></div><div class="calendar" id="calendar"></div><div id="calendarDayDetails" class="day-detail" aria-live="polite"><div class="empty">點選月曆上的日期，即可查看當日收支明細。</div></div></section><section class="card">
+</div></details></section>
+<section class="card" id="creditCardSection">
+<details class="collapsible-section" open><summary><h2>💳 信用卡管理 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content">
+<div class="grid3"><div class="stat"><div class="label">信用卡未繳欠款</div><div class="val expense" id="cardDebtTotal">$0</div></div><div class="stat"><div class="label">信用額度總計</div><div class="val" id="cardLimitTotal">$0</div></div><div class="stat"><div class="label">可用額度總計</div><div class="val income" id="cardAvailableTotal">$0</div></div></div>
+<h3 style="margin:16px 0 8px">我的信用卡</h3><div id="creditCardList"></div>
+<h3 style="margin:18px 0 8px">＋ 新增信用卡</h3><div class="form"><div><label>信用卡名稱</label><input id="newCardName" placeholder="例如：國泰 Cube 卡"/></div><div><label>信用額度</label><input id="newCardLimit" type="number" min="0" step="1" inputmode="decimal" placeholder="例如 100000"/></div><div><label>結帳日（每月）</label><input id="newCardStatementDay" type="number" min="1" max="31" value="20"/></div><div><label>繳款日（每月）</label><input id="newCardDueDay" type="number" min="1" max="31" value="10"/></div></div><button class="btn primary full" id="addCreditCardBtn" style="margin-top:10px" type="button">＋ 新增信用卡</button>
+<h3 style="margin:20px 0 8px">💸 繳信用卡費</h3><div class="label" style="margin-bottom:10px">繳款會扣除選定的銀行帳戶餘額，並減少信用卡欠款，不會重複計入支出。</div><div class="form"><div><label>信用卡</label><select id="payCardSelect"></select></div><div><label>扣款銀行帳戶</label><select id="payBankSelect"></select></div><div><label>繳款日期</label><input id="cardPaymentDate" type="date"/></div><div><label>繳款金額</label><input id="cardPaymentAmount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="例如 5000"/></div><div style="grid-column:1/-1"><label>備註</label><input id="cardPaymentNote" placeholder="例如 10 月信用卡帳單"/></div></div><button class="btn primary full" id="payCreditCardBtn" style="margin-top:10px" type="button">確認繳款</button><div id="cardPaymentList" style="margin-top:12px"></div>
+</div></details></section>
+<section class="card"><details class="collapsible-section"><summary><h2>🗓️ 月份總覽 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content"><div class="table"><table><thead><tr><th>月份</th><th>收入</th><th>支出</th><th>淨額</th><th>筆數</th></tr></thead><tbody id="monthTable"></tbody></table></div></div></details></section><section class="card"><h2>📆 月曆</h2><div class="calendarhead"><div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div></div><div class="calendar" id="calendar"></div><div id="calendarDayDetails" class="day-detail" aria-live="polite"><div class="empty">點選月曆上的日期，即可查看當日收支明細。</div></div></section><section class="card">
 <h2>📅 月份切換</h2>
 <div class="monthnav"><button class="btn" id="prev" type="button">‹</button><div class="monthtitle" id="monthTitle"></div><button class="btn" id="next" type="button">›</button></div>
 <div class="grid3" style="margin-top:10px"><div class="stat"><div class="label">本月收入</div><div class="val income" id="mi">$0</div></div><div class="stat"><div class="label">本月支出</div><div class="val expense" id="me">$0</div></div><div class="stat"><div class="label">本月淨額</div><div class="val net" id="mn">$0</div></div></div>
@@ -110,7 +118,9 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 <div class="tabs"><button class="tab in active" id="incomeBtn" type="button">🟢 收入</button><button class="tab out" id="expenseBtn" type="button">🔴 支出</button></div>
 <div class="status in" id="status">目前選擇：收入</div>
 <div class="form">
-<div><label>銀行帳戶</label><select id="accountSelect"></select></div>
+<div><label>銀行帳戶（收入／銀行付款時使用）</label><select id="accountSelect"></select></div>
+<div><label>付款方式（支出時）</label><select id="paymentMethod"><option value="bank">銀行帳戶</option><option value="card">信用卡</option></select></div>
+<div id="purchaseCardWrap" style="display:none"><label>使用信用卡</label><select id="purchaseCardSelect"></select></div>
 <div><label>日期</label><input id="date" type="date"/></div>
 <div><label>分類</label><select id="category"></select></div>
 <div><label>金額</label><input id="amount" inputmode="decimal" min="0" placeholder="例如 500" step="0.01" type="number"/></div>
@@ -187,7 +197,7 @@ var totalHidden=true;
 var KEY="balance_book_shared_category_v1";
 var CATS=["餐飲","交通","娛樂","購物","日用品","住房","醫療","電信","保險","薪資","獎金","兼職","投資","其他"];
 var COLORS=["#2563eb","#ef4444","#10b981","#f59e0b","#8b5cf6","#ec4899","#14b8a6","#f97316","#06b6d4","#84cc16","#6366f1","#64748b"];
-var data={accounts:[],records:[],transfers:[],budgets:[]};
+var data={accounts:[],records:[],transfers:[],budgets:[],creditCards:[],cardPayments:[]};
 var currentMonth="";
 var currentType="income";
 var rankType="expense";
@@ -244,7 +254,7 @@ function loadData(){
       }
       var first=data.accounts[0].id;
       data.records=Array.isArray(x.records)?x.records.map(function(r){
-        return {id:r.id||String(Date.now())+String(Math.random()),type:r.type==="expense"?"expense":"income",date:r.date||today(),category:r.category||"其他",amount:Math.abs(Number(r.amount)||0),note:r.note||"",accountId:r.accountId||first};
+        return {id:r.id||String(Date.now())+String(Math.random()),type:r.type==="expense"?"expense":"income",date:r.date||today(),category:r.category||"其他",amount:Math.abs(Number(r.amount)||0),note:r.note||"",accountId:r.accountId||first,paymentMethod:r.paymentMethod==="card"?"card":"bank",cardId:r.cardId||""};
       }):[];
       data.budgets=Array.isArray(x.budgets)?x.budgets.map(function(b){return {id:b.id||("bud_"+Date.now()+Math.random()),month:b.month||today().slice(0,7),category:b.category||"餐飲",amount:Math.abs(Number(b.amount)||0),alertPercent:Number(b.alertPercent)||80,enabled:b.enabled!==false};}).filter(function(b){return b.amount>0;}):[];
       data.budgets=Array.isArray(x.budgets)?x.budgets.map(function(b){return {id:b.id||("bud_"+Date.now()+Math.random()),month:b.month||today().slice(0,7),category:b.category||"餐飲",amount:Math.abs(Number(b.amount)||0),alertPercent:Number(b.alertPercent)||80,enabled:b.enabled!==false};}).filter(function(b){return b.amount>0;}):[];
@@ -256,6 +266,8 @@ function loadData(){
   if(!data.accounts.length) data.accounts=[{id:"acc_default",name:"未分類帳戶",initialBalance:0,initialDate:today()}];
   if(!Array.isArray(data.transfers)) data.transfers=[];
   if(!Array.isArray(data.budgets)) data.budgets=[];
+  if(!Array.isArray(data.creditCards)) data.creditCards=[];
+  if(!Array.isArray(data.cardPayments)) data.cardPayments=[];
   var firstId=data.accounts[0].id;
   for(var i=0;i<data.records.length;i++) if(!data.records[i].accountId) data.records[i].accountId=firstId;
 }
@@ -286,7 +298,7 @@ function renderBudgets(){
       var rows=data.records.filter(function(r){return r.type==="expense"&&String(r.date||"").slice(0,7)===month&&r.category===category;}).sort(function(a,b){return String(b.date).localeCompare(String(a.date));});
       var total=sum(rows,"expense"),details='<div style="margin-top:12px;padding:12px;border-radius:12px;background:rgba(255,255,255,.75)"><b>🧾 '+escapeHtml(month)+'｜'+escapeHtml(category)+' 消費明細</b><div class="rmeta">共 '+rows.length+' 筆，合計 '+money(total)+'</div>';
       if(!rows.length)details+='<div class="empty">這個月份尚無此分類的支出紀錄。</div>';
-      for(var q=0;q<rows.length;q++){var r=rows[q];details+='<div class="day-record"><div><b>📅 '+escapeHtml(r.date||"")+'</b><div class="day-record-note">'+escapeHtml(accountName(r.accountId))+(r.note?' · '+escapeHtml(r.note):'')+'</div></div><b class="expense">−'+money(r.amount)+'</b></div>';}
+      for(var q=0;q<rows.length;q++){var r=rows[q];details+='<div class="day-record"><div><b>📅 '+escapeHtml(r.date||"")+'</b><div class="day-record-note">'+escapeHtml((r.paymentMethod==="card"?(cardById(r.cardId)?cardById(r.cardId).name:"信用卡"):accountName(r.accountId)))+(r.note?' · '+escapeHtml(r.note):'')+'</div></div><b class="expense">−'+money(r.amount)+'</b></div>';}
       details+='</div>';panel.innerHTML=details;panel.hidden=false;this.setAttribute("aria-expanded","true");
     }else{panel.hidden=true;this.setAttribute("aria-expanded","false");}
   });
@@ -306,6 +318,7 @@ function requestBudgetNotification(){if(!("Notification" in window)){showToast("
 function checkBudgetNotifications(){if(!("Notification" in window)||Notification.permission!=="granted")return;var m=today().slice(0,7),list=data.budgets.filter(function(b){return b.month===m&&b.enabled;});for(var i=0;i<list.length;i++){var b=list[i],spent=budgetExpense(m,b.category),pct=b.amount?spent/b.amount*100:0,key="budget_notified_"+b.id+"_"+m;if(pct>=b.alertPercent&&!localStorage.getItem(key)){new Notification("我的記帳｜預算提醒",{body:b.category+" 已支出 "+money(spent)+"，達到預算的 "+pct.toFixed(0)+"%"});localStorage.setItem(key,"1");}}}
 function setType(type){
   currentType=type;
+  if($("paymentMethod")){ $("paymentMethod").disabled=type!=="expense"; if(type!=="expense")$("purchaseCardWrap").style.display="none"; else $("purchaseCardWrap").style.display=$("paymentMethod").value==="card"?"block":"none"; }
   var income=type==="income";
   $("incomeBtn").classList.toggle("active",income);
   $("expenseBtn").classList.toggle("active",!income);
@@ -318,7 +331,7 @@ function accountById(id){
   return null;
 }
 function accountName(id){var a=accountById(id);return a?a.name:"未分類帳戶";}
-function accountRows(id){return data.records.filter(function(r){return String(r.accountId)===String(id);});}
+function accountRows(id){return data.records.filter(function(r){return String(r.accountId)===String(id)&&!(r.type==="expense"&&r.paymentMethod==="card");});}
 function transferRows(id){
   return data.transfers.filter(function(t){
     return String(t.fromAccountId)===String(id)||String(t.toAccountId)===String(id);
@@ -328,12 +341,14 @@ function transferCount(id){return transferRows(id).length;}
 function accountBalance(id){
   var a=accountById(id); if(!a)return 0;
   var rows=accountRows(id);
-  var balance=(Number(a.initialBalance)||0)+sum(rows,"income")-sum(rows,"expense");
+  var bankExpenses=rows.filter(function(r){return !(r.type==="expense"&&r.paymentMethod==="card");});
+  var balance=(Number(a.initialBalance)||0)+sum(rows,"income")-sum(bankExpenses,"expense");
   for(var i=0;i<data.transfers.length;i++){
     var t=data.transfers[i],amt=Number(t.amount)||0;
     if(String(t.fromAccountId)===String(id)) balance-=amt;
     if(String(t.toAccountId)===String(id)) balance+=amt;
   }
+  for(var p=0;p<data.cardPayments.length;p++) if(String(data.cardPayments[p].accountId)===String(id)) balance-=Number(data.cardPayments[p].amount)||0;
   return balance;
 }
 function fillAccounts(){
@@ -420,9 +435,53 @@ function renderAccountDetail(){
   for(var n=0;n<tds.length;n++)tds[n].addEventListener("click",function(){deleteTransfer(this.getAttribute("data-transfer-delete"));});
 }
 
+function cardById(id){for(var i=0;i<data.creditCards.length;i++)if(String(data.creditCards[i].id)===String(id))return data.creditCards[i];return null;}
+function cardPurchases(id){return data.records.filter(function(r){return r.type==="expense"&&r.paymentMethod==="card"&&String(r.cardId)===String(id);});}
+function cardPayments(id){return data.cardPayments.filter(function(p){return String(p.cardId)===String(id);});}
+function cardOutstanding(id){return Math.max(0,sum(cardPurchases(id))-sum(cardPayments(id)));}
+function cardAvailable(id){var c=cardById(id);return Math.max(0,(Number(c&&c.limit)||0)-cardOutstanding(id));}
+function fillCreditCardSelects(){
+  var opts=data.creditCards.map(function(c){return '<option value="'+escapeHtml(c.id)+'">'+escapeHtml(c.name)+'</option>';}).join("");
+  ["purchaseCardSelect","payCardSelect"].forEach(function(id){var el=$(id);if(!el)return;var old=el.value;el.innerHTML=opts||'<option value="">尚未新增信用卡</option>';if(data.creditCards.some(function(c){return String(c.id)===String(old);}))el.value=old;});
+  var bankOpts=data.accounts.map(function(a){return '<option value="'+escapeHtml(a.id)+'">'+escapeHtml(a.name)+'</option>';}).join("");
+  var bank=$("payBankSelect"),oldBank=bank.value;bank.innerHTML=bankOpts;if(data.accounts.some(function(a){return String(a.id)===String(oldBank);}))bank.value=oldBank;
+}
+function renderCreditCards(){
+  fillCreditCardSelects();
+  var debt=0,limit=0,available=0,html="";
+  for(var i=0;i<data.creditCards.length;i++){
+    var c=data.creditCards[i],d=cardOutstanding(c.id),l=Number(c.limit)||0,a=cardAvailable(c.id);debt+=d;limit+=l;available+=a;
+    var pct=l>0?Math.min(100,Math.max(0,d/l*100)):0;
+    html+='<div class="budgetitem" style="margin-top:10px"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div><div style="font-size:18px;font-weight:900">💳 '+escapeHtml(c.name)+'</div><div class="label" style="font-size:13px;margin-top:4px">結帳日每月 '+Number(c.statementDay||20)+' 日・繳款日每月 '+Number(c.dueDay||10)+' 日</div></div><button class="btn danger" type="button" data-delete-card="'+escapeHtml(c.id)+'">刪除</button></div><div class="grid3" style="margin-top:10px"><div class="stat"><div class="label">未繳欠款</div><div class="val expense">'+money(d)+'</div></div><div class="stat"><div class="label">已使用額度</div><div class="val">'+money(d)+'</div></div><div class="stat"><div class="label">可用額度</div><div class="val income">'+money(a)+'</div></div></div><div class="label" style="margin-top:8px">信用額度 '+money(l)+'（使用率 '+pct.toFixed(1)+'%）</div><div class="budgetbar"><div class="budgetfill" style="width:'+pct+'%;background:'+(pct>=90?'#dc3545':pct>=70?'#f59e0b':'#198754')+'"></div></div><div class="label" style="font-size:13px">本月刷卡 '+money(sum(cardPurchases(c.id).filter(function(r){return String(r.date).slice(0,7)===currentMonth;})))+'</div></div>';
+  }
+  $("cardDebtTotal").textContent=money(debt);$("cardLimitTotal").textContent=money(limit);$("cardAvailableTotal").textContent=money(available);
+  $("creditCardList").innerHTML=html||'<div class="empty">尚未新增信用卡，請填寫下方資料新增。</div>';
+  var payments=data.cardPayments.slice().sort(function(a,b){return String(b.date).localeCompare(String(a.date));}).slice(0,8),ph="";
+  for(var j=0;j<payments.length;j++){var pay=payments[j],card=cardById(pay.cardId);ph+='<div class="record"><div style="padding:12px"><div style="display:flex;justify-content:space-between;gap:8px"><b>'+escapeHtml(card?card.name:"已刪除的信用卡")+'｜繳款 '+escapeHtml(pay.date)+'</b><b class="expense">-'+money(pay.amount)+'</b></div><div class="rmeta">扣款帳戶：'+escapeHtml(accountName(pay.accountId))+(pay.note?'・'+escapeHtml(pay.note):'')+'</div><div class="actions"><button class="btn danger" type="button" data-delete-card-payment="'+escapeHtml(pay.id)+'">刪除此繳款</button></div></div></div>';}
+  $("cardPaymentList").innerHTML=payments.length?'<h3 style="font-size:16px">最近繳款紀錄</h3>'+ph:"";
+  var del=$("creditCardList").querySelectorAll("[data-delete-card]");for(var k=0;k<del.length;k++)del[k].addEventListener("click",function(){deleteCreditCard(this.getAttribute("data-delete-card"));});
+  var dels=$("cardPaymentList").querySelectorAll("[data-delete-card-payment]");for(var z=0;z<dels.length;z++)dels[z].addEventListener("click",function(){deleteCardPayment(this.getAttribute("data-delete-card-payment"));});
+}
+function addCreditCard(){
+  var name=$("newCardName").value.trim(),limit=Number($("newCardLimit").value),sd=Number($("newCardStatementDay").value),dd=Number($("newCardDueDay").value);
+  if(!name){showToast("請輸入信用卡名稱");return;}if(!isFinite(limit)||limit<=0){showToast("請輸入大於 0 的信用額度");return;}if(sd<1||sd>31||dd<1||dd>31){showToast("結帳日與繳款日請填 1 到 31 日");return;}
+  if(data.creditCards.some(function(c){return c.name===name;})){showToast("這張信用卡已存在");return;}
+  data.creditCards.push({id:"card_"+Date.now()+"_"+Math.random().toString(36).slice(2),name:name,limit:limit,statementDay:sd,dueDay:dd});safeSave();$("newCardName").value="";$("newCardLimit").value="";render();showToast("已新增信用卡");
+}
+function deleteCreditCard(id){
+  if(cardPurchases(id).length||cardPayments(id).length){showToast("這張卡已有消費或繳款紀錄，為避免資料遺失，暫時不能刪除");return;}
+  if(!window.confirm("確定刪除這張信用卡嗎？"))return;data.creditCards=data.creditCards.filter(function(c){return String(c.id)!==String(id);});safeSave();render();showToast("信用卡已刪除");
+}
+function payCreditCard(){
+  var cardId=$("payCardSelect").value,accountId=$("payBankSelect").value,date=$("cardPaymentDate").value,amount=Number($("cardPaymentAmount").value),note=$("cardPaymentNote").value.trim();
+  if(!cardById(cardId)){showToast("請先新增並選擇信用卡");return;}if(!accountById(accountId)){showToast("請選擇扣款銀行帳戶");return;}if(!date||!isFinite(amount)||amount<=0){showToast("請確認繳款日期與金額");return;}if(amount>cardOutstanding(cardId)+0.0001){if(!window.confirm("繳款金額大於目前這張卡的未繳欠款，仍要記錄嗎？"))return;}
+  data.cardPayments.push({id:"cp_"+Date.now()+"_"+Math.random().toString(36).slice(2),cardId:cardId,accountId:accountId,date:date,amount:amount,note:note});currentMonth=date.slice(0,7);safeSave();$("cardPaymentAmount").value="";$("cardPaymentNote").value="";render();showToast("信用卡繳款已記錄");
+}
+function deleteCardPayment(id){if(!window.confirm("確定刪除這筆信用卡繳款？銀行餘額及信用卡欠款會重新計算。"))return;data.cardPayments=data.cardPayments.filter(function(p){return String(p.id)!==String(id);});safeSave();render();showToast("繳款紀錄已刪除");}
 function render(){
   renderTop();
   renderAccounts();
+  renderCreditCards();
   renderAccountDetail();
   renderMonth();
   renderBudgets();
@@ -441,6 +500,7 @@ function renderTop(){
   var counts={};
   data.records.forEach(function(r){var m=String(r.date||"").slice(0,7);if(m)counts[m]=(counts[m]||0)+1;});
   data.transfers.forEach(function(t){var m=String(t.date||"").slice(0,7);if(m)counts[m]=(counts[m]||0)+1;});
+  data.cardPayments.forEach(function(p){var m=String(p.date||"").slice(0,7);if(m)counts[m]=(counts[m]||0)+1;});
   var months=Object.keys(counts).sort().reverse(),countHtml="";
   for(var j=0;j<months.length;j++)countHtml+='<div class="monthbox"><div class="label">'+escapeHtml(monthLabel(months[j]))+'</div><div style="font-size:20px;font-weight:900;margin-top:4px">'+counts[months[j]]+' <span style="font-size:13px;font-weight:500">筆</span></div></div>';
   $("monthRecordCounts").innerHTML=countHtml||'<div class="empty">尚無紀錄</div>';
@@ -536,7 +596,7 @@ function renderCalendarDayDetails(selectedDate){
   else{
     for(var i=0;i<rows.length;i++){
       var r=rows[i];
-      html+='<div class="day-record"><div><b>'+(r.type==="income"?'💵 收入':'💸 支出')+' · '+escapeHtml(r.category||'未分類')+'</b><div class="day-record-note">'+escapeHtml(accountName(r.accountId))+(r.note?' · '+escapeHtml(r.note):'')+'</div></div><b class="'+r.type+'">'+(r.type==="income"?'+':'−')+money(r.amount)+'</b></div>';
+      html+='<div class="day-record"><div><b>'+(r.type==="income"?'💵 收入':'💸 支出')+' · '+escapeHtml(r.category||'未分類')+'</b><div class="day-record-note">'+escapeHtml((r.paymentMethod==="card"?(cardById(r.cardId)?cardById(r.cardId).name:"信用卡"):accountName(r.accountId)))+(r.note?' · '+escapeHtml(r.note):'')+'</div></div><b class="'+r.type+'">'+(r.type==="income"?'+':'−')+money(r.amount)+'</b></div>';
     }
   }
   panel.innerHTML=html;
@@ -572,7 +632,7 @@ function renderMonths(){
 function getFiltered(){
   var key=$("search").value.trim().toLowerCase(),account=$("accountFilter").value,type=$("typeFilter").value,cat=$("categoryFilter").value,mo=$("monthFilter").value;
   return data.records.filter(function(r){
-    var text=(r.note+" "+r.category+" "+accountName(r.accountId)).toLowerCase();
+    var text=(r.note+" "+r.category+" "+(r.paymentMethod==="card"?(cardById(r.cardId)?cardById(r.cardId).name:"信用卡"):accountName(r.accountId))).toLowerCase();
     return (!key||text.indexOf(key)>=0)&&(account==="all"||String(r.accountId)===String(account))&&(type==="all"||r.type===type)&&(cat==="all"||r.category===cat)&&(!mo||r.date.indexOf(mo)===0);
   }).sort(function(a,b){return b.date.localeCompare(a.date)||String(b.id).localeCompare(String(a.id));});
 }
@@ -584,7 +644,7 @@ function renderRecords(){
     html+='<button type="button" class="record-toggle" data-toggle-record="'+rid+'" aria-expanded="false">';
     html+='<div class="record-summary"><div class="record-summary-top"><span class="rtitle">'+(r.type==="income"?"💵 收入 · ":"💸 支出 · ")+escapeHtml(r.category)+'</span><span class="ramount '+r.type+'">'+(r.type==="income"?"+":"-")+money(r.amount)+'</span></div>';
     html+='<div class="rmeta">📅 '+escapeHtml(r.date)+'　⌄ 點擊查看詳情</div></div><span class="record-chevron">＋</span></button>';
-    html+='<div class="record-details" data-record-details="'+rid+'"><div class="rmeta" style="margin-top:10px">🏦 銀行帳戶：'+escapeHtml(accountName(r.accountId))+'</div>';
+    html+='<div class="record-details" data-record-details="'+rid+'"><div class="rmeta" style="margin-top:10px">付款來源：'+escapeHtml((r.paymentMethod==="card"?(cardById(r.cardId)?cardById(r.cardId).name:"信用卡"):accountName(r.accountId)))+'</div>';
     if(r.note) html+='<div class="rnote">📝 '+escapeHtml(r.note)+'</div>';
     html+='<div class="actions"><button type="button" class="btn" data-edit="'+rid+'">✏️ 編輯</button><button type="button" class="btn danger" data-delete="'+rid+'">🗑️ 刪除</button></div></div></div>';
   }
@@ -658,7 +718,9 @@ function addRecord(){
   if(!date){showToast("請選擇日期");return;}
   if(!cat){showToast("請選擇分類");return;}
   if(!isFinite(amount)||amount<=0){showToast("請輸入大於 0 的金額");return;}
-  data.records.push({id:String(Date.now())+String(Math.random()).slice(2),type:currentType,date:date,category:cat,amount:amount,note:note,accountId:accountId});
+  var method=currentType==="expense"?$("paymentMethod").value:"bank",cardId=method==="card"?$("purchaseCardSelect").value:"";
+  if(method==="card"&&!cardById(cardId)){showToast("請先到信用卡管理新增信用卡");return;}
+  data.records.push({id:String(Date.now())+String(Math.random()).slice(2),type:currentType,date:date,category:cat,amount:amount,note:note,accountId:accountId,paymentMethod:method,cardId:cardId});
   currentMonth=date.slice(0,7);
   var ok=safeSave();
   $("amount").value="";$("note").value="";
@@ -694,7 +756,7 @@ function deleteRecord(id){
   safeSave();render();showToast("紀錄已刪除");
 }
 function downloadJSON(name){
-  var blob=new Blob([JSON.stringify({version:6,exportedAt:new Date().toISOString(),accounts:data.accounts,records:data.records,transfers:data.transfers,budgets:data.budgets},null,2)],{type:"application/json"});
+  var blob=new Blob([JSON.stringify({version:6,exportedAt:new Date().toISOString(),accounts:data.accounts,records:data.records,transfers:data.transfers,budgets:data.budgets,creditCards:data.creditCards,cardPayments:data.cardPayments},null,2)],{type:"application/json"});
   var url=URL.createObjectURL(blob),a=document.createElement("a");
   a.href=url;a.download=name;document.body.appendChild(a);a.click();document.body.removeChild(a);
   setTimeout(function(){URL.revokeObjectURL(url);},1000);
@@ -718,7 +780,7 @@ function restoreFile(file){
         data.accounts=[{id:"acc_default",name:"未分類帳戶",initialBalance:Number(x.initialBalance)||0,initialDate:x.initialDate||today()}];
       }
       var first=data.accounts[0].id;
-      data.records=x.records.map(function(r){return {id:r.id||String(Date.now())+String(Math.random()),type:r.type==="expense"?"expense":"income",date:r.date||today(),category:r.category||"其他",amount:Math.abs(Number(r.amount)||0),note:r.note||"",accountId:r.accountId||first};});
+      data.records=x.records.map(function(r){return {id:r.id||String(Date.now())+String(Math.random()),type:r.type==="expense"?"expense":"income",date:r.date||today(),category:r.category||"其他",amount:Math.abs(Number(r.amount)||0),note:r.note||"",accountId:r.accountId||first,paymentMethod:r.paymentMethod==="card"?"card":"bank",cardId:r.cardId||""};});
       for(var i=0;i<data.records.length;i++)if(!accountById(data.records[i].accountId))data.records[i].accountId=first;
       data.budgets=Array.isArray(x.budgets)?x.budgets.map(function(b){return {id:b.id||("bud_"+Date.now()+Math.random()),month:b.month||today().slice(0,7),category:b.category||"餐飲",amount:Math.abs(Number(b.amount)||0),alertPercent:Number(b.alertPercent)||80,enabled:b.enabled!==false};}).filter(function(b){return b.amount>0;}):[];
       data.transfers=Array.isArray(x.transfers)?x.transfers.map(function(t){return {id:t.id||String(Date.now())+String(Math.random()),fromAccountId:t.fromAccountId||first,toAccountId:t.toAccountId||first,date:t.date||today(),amount:Math.abs(Number(t.amount)||0),note:t.note||""};}).filter(function(t){return String(t.fromAccountId)!==String(t.toAccountId)&&t.amount>0;}):[];
@@ -726,6 +788,9 @@ function restoreFile(file){
         if(!accountById(data.transfers[j].fromAccountId))data.transfers[j].fromAccountId=first;
         if(!accountById(data.transfers[j].toAccountId))data.transfers[j].toAccountId=first;
       }
+      data.creditCards=Array.isArray(x.creditCards)?x.creditCards.map(function(c){return {id:c.id||("card_"+Date.now()+Math.random()),name:c.name||"信用卡",limit:Math.max(0,Number(c.limit)||0),statementDay:Number(c.statementDay)||20,dueDay:Number(c.dueDay)||10};}):[];
+      data.cardPayments=Array.isArray(x.cardPayments)?x.cardPayments.map(function(p){return {id:p.id||("cp_"+Date.now()+Math.random()),cardId:p.cardId||"",accountId:p.accountId||first,date:p.date||today(),amount:Math.abs(Number(p.amount)||0),note:p.note||""};}).filter(function(p){return p.amount>0;}):[];
+      for(var q=0;q<data.cardPayments.length;q++){if(!accountById(data.cardPayments[q].accountId))data.cardPayments[q].accountId=first;}
       if(!safeSave()) throw new Error("save_failed");
       currentAccountId=null;fillAccounts();currentMonth=today().slice(0,7);render();showToast("資料已還原");
     }catch(e){
@@ -750,6 +815,7 @@ function init(){
   currentAccountId=null;
 
   $("date").value=today();
+  $("cardPaymentDate").value=today();
   $("transferDate").value=today();
   $("transferFrom").value=data.accounts[0].id;
   $("transferTo").value=data.accounts.length>1?data.accounts[1].id:data.accounts[0].id;
@@ -762,6 +828,9 @@ function init(){
   $("incomeBtn").addEventListener("click",function(){setType("income");});
   $("expenseBtn").addEventListener("click",function(){setType("expense");});
   $("addBtn").addEventListener("click",addRecord);
+  $("addCreditCardBtn").addEventListener("click",addCreditCard);
+  $("payCreditCardBtn").addEventListener("click",payCreditCard);
+  $("paymentMethod").addEventListener("change",function(){var show=currentType==="expense"&&this.value==="card";$("purchaseCardWrap").style.display=show?"block":"none";});
   $("transferBtn").addEventListener("click",addTransfer);
   $("saveInitialBtn").addEventListener("click",saveInitial);
   $("addAccountBtn").addEventListener("click",addAccount);
@@ -791,7 +860,7 @@ function init(){
   $("restoreInput").addEventListener("change",function(){restoreFile(this.files[0]);this.value="";});
   $("clearAllBtn").addEventListener("click",function(){
     if(window.confirm("確定清除全部紀錄嗎？建議先備份資料。")){
-      data.records=[];safeSave();render();showToast("全部紀錄已清除");
+      data.records=[];data.transfers=[];data.cardPayments=[];safeSave();render();showToast("全部紀錄已清除");
     }
   });
 
