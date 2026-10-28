@@ -478,7 +478,7 @@ function renderCreditCards(){
   for(var i=0;i<data.creditCards.length;i++){
     var c=data.creditCards[i],d=cardOutstanding(c.id),l=Number(c.limit)||0,a=cardAvailable(c.id);debt+=d;limit+=l;available+=a;
     var pct=l>0?Math.min(100,Math.max(0,d/l*100)):0;
-    html+='<div class="budgetitem" style="margin-top:10px"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div><div style="font-size:18px;font-weight:900">💳 '+escapeHtml(c.name)+'</div><div class="label" style="font-size:13px;margin-top:4px">結帳日每月 '+Number(c.statementDay||20)+' 日・繳款日每月 '+Number(c.dueDay||10)+' 日</div></div><button class="btn danger" type="button" data-delete-card="'+escapeHtml(c.id)+'">刪除</button></div><div class="grid3" style="margin-top:10px"><div class="stat"><div class="label">未繳欠款</div><div class="val expense">'+money(d)+'</div></div><div class="stat"><div class="label">已使用額度</div><div class="val">'+money(d)+'</div></div><div class="stat"><div class="label">可用額度</div><div class="val income">'+money(a)+'</div></div></div><div class="label" style="margin-top:8px">信用額度 '+money(l)+'（使用率 '+pct.toFixed(1)+'%）</div><div class="budgetbar"><div class="budgetfill" style="width:'+pct+'%;background:'+(pct>=90?'#dc3545':pct>=70?'#f59e0b':'#198754')+'"></div></div><div class="label" style="font-size:13px">本月刷卡 '+money(sum(cardPurchases(c.id).filter(function(r){return String(r.date).slice(0,7)===currentMonth;})))+'</div></div>';
+    html+='<div class="budgetitem" style="margin-top:10px"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div><div style="font-size:18px;font-weight:900">💳 '+escapeHtml(c.name)+'</div><div class="label" style="font-size:13px;margin-top:4px">目前結帳日：每月 '+Number(c.statementDay||20)+' 日・繳款日：每月 '+Number(c.dueDay||10)+' 日</div></div><button class="btn danger" type="button" data-delete-card="'+escapeHtml(c.id)+'">刪除</button></div><div class="form" style="margin-top:10px"><div><label>修改結帳日（每月 1–31 日）</label><input type="number" min="1" max="31" step="1" value="'+Number(c.statementDay||20)+'" data-card-statement-day="'+escapeHtml(c.id)+'"/></div><div style="display:flex;align-items:end"><button class="btn primary full" type="button" data-save-card-statement="'+escapeHtml(c.id)+'">儲存結帳日</button></div></div><div class="grid3" style="margin-top:10px"><div class="stat"><div class="label">未繳欠款</div><div class="val expense">'+money(d)+'</div></div><div class="stat"><div class="label">已使用額度</div><div class="val">'+money(d)+'</div></div><div class="stat"><div class="label">可用額度</div><div class="val income">'+money(a)+'</div></div></div><div class="label" style="margin-top:8px">信用額度 '+money(l)+'（使用率 '+pct.toFixed(1)+'%）</div><div class="budgetbar"><div class="budgetfill" style="width:'+pct+'%;background:'+(pct>=90?'#dc3545':pct>=70?'#f59e0b':'#198754')+'"></div></div><div class="label" style="font-size:13px">本月刷卡 '+money(sum(cardPurchases(c.id).filter(function(r){return String(r.date).slice(0,7)===currentMonth;})))+'</div></div>';
   }
   $("cardDebtTotal").textContent=money(debt);$("cardLimitTotal").textContent=money(limit);$("cardAvailableTotal").textContent=money(available);
   $("creditCardList").innerHTML=html||'<div class="empty">尚未新增信用卡，請填寫下方資料新增。</div>';
@@ -487,6 +487,7 @@ function renderCreditCards(){
   renderCardStatement();
   $("cardPaymentList").innerHTML=payments.length?'<h3 style="font-size:16px">最近繳款紀錄</h3>'+ph:"";
   var del=$("creditCardList").querySelectorAll("[data-delete-card]");for(var k=0;k<del.length;k++)del[k].addEventListener("click",function(){deleteCreditCard(this.getAttribute("data-delete-card"));});
+  var saveDays=$("creditCardList").querySelectorAll("[data-save-card-statement]");for(var sd=0;sd<saveDays.length;sd++)saveDays[sd].addEventListener("click",function(){updateCardStatementDay(this.getAttribute("data-save-card-statement"));});
   var dels=$("cardPaymentList").querySelectorAll("[data-delete-card-payment]");for(var z=0;z<dels.length;z++)dels[z].addEventListener("click",function(){deleteCardPayment(this.getAttribute("data-delete-card-payment"));});
 }
 function renderCardStatement(){
@@ -506,6 +507,14 @@ function addCreditCard(){
   if(!name){showToast("請輸入信用卡名稱");return;}if(!isFinite(limit)||limit<=0){showToast("請輸入大於 0 的信用額度");return;}if(sd<1||sd>31||dd<1||dd>31){showToast("結帳日與繳款日請填 1 到 31 日");return;}
   if(data.creditCards.some(function(c){return c.name===name;})){showToast("這張信用卡已存在");return;}
   data.creditCards.push({id:"card_"+Date.now()+"_"+Math.random().toString(36).slice(2),name:name,limit:limit,statementDay:sd,dueDay:dd});safeSave();$("newCardName").value="";$("newCardLimit").value="";render();showToast("已新增信用卡");
+}
+function updateCardStatementDay(id){
+  var c=cardById(id);if(!c){showToast("找不到這張信用卡");return;}
+  var input=$("creditCardList").querySelector('[data-card-statement-day="'+String(id)+'"]');
+  var day=input?Number(input.value):NaN;
+  if(!Number.isInteger(day)||day<1||day>31){showToast("結帳日請輸入 1 到 31 的整數");if(input)input.focus();return;}
+  if(Number(c.statementDay)===day){showToast("結帳日沒有變更");return;}
+  c.statementDay=day;safeSave();render();showToast("已更新結帳日；帳單區間與各期帳單會依新結帳日重新計算");
 }
 function deleteCreditCard(id){
   if(cardPurchases(id).length||cardPayments(id).length){showToast("這張卡已有消費或繳款紀錄，為避免資料遺失，暫時不能刪除");return;}
