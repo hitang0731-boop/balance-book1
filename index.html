@@ -102,12 +102,12 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 <div id="accountManage" style="margin-top:12px"></div>
 </div></details></section>
 
-<section class="card"><details class="collapsible-section"><summary><h2>🗓️ 月份總覽 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content"><div class="table"><table><thead><tr><th>月份</th><th>收入</th><th>支出</th><th>淨額</th><th>筆數</th></tr></thead><tbody id="monthTable"></tbody></table></div></div></details></section><section class="card"><h2>📆 月曆</h2><div class="calendarhead"><div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div></div><div class="calendar" id="calendar"></div><div id="calendarDayDetails" class="day-detail" aria-live="polite"><div class="empty">點選月曆上的日期，即可查看當日收支明細。</div></div></section><section class="card">
-<h2>📅 月份切換</h2>
+<section class="card"><details class="collapsible-section"><summary><h2>🗓️ 月份總覽 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content"><div class="table"><table><thead><tr><th>月份</th><th>收入</th><th>支出</th><th>淨額</th><th>筆數</th></tr></thead><tbody id="monthTable"></tbody></table></div></div></details></section><section class="card"><details class="collapsible-section"><summary><h2>📆 月曆 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content"><div class="calendarhead"><div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div></div><div class="calendar" id="calendar"></div><div id="calendarDayDetails" class="day-detail" aria-live="polite"><div class="empty">點選月曆上的日期，即可查看當日收支明細。</div></div></div></details></section><section class="card">
+<details class="collapsible-section"><summary><h2>📅 月份切換 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content">
 <div class="monthnav"><button class="btn" id="prev" type="button">‹</button><div class="monthtitle" id="monthTitle"></div><button class="btn" id="next" type="button">›</button></div>
 <div class="grid3" style="margin-top:10px"><div class="stat"><div class="label">本月收入</div><div class="val income" id="mi">$0</div></div><div class="stat"><div class="label">本月支出</div><div class="val expense" id="me">$0</div></div><div class="stat"><div class="label">本月淨額</div><div class="val net" id="mn">$0</div></div></div>
 <button class="btn" id="now" style="margin-top:10px" type="button">回到本月</button>
-</section><section class="card">
+</div></details></section><section class="card">
 <h2>＋ 新增紀錄</h2>
 <div class="tabs"><button class="tab in active" id="incomeBtn" type="button">🟢 收入</button><button class="tab out" id="expenseBtn" type="button">🔴 支出</button></div>
 <div class="status in" id="status">目前選擇：收入</div>
