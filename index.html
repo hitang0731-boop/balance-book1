@@ -179,7 +179,7 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 
 
 
-<section class="card"><h2>🥧 分類圓餅圖</h2><div id="chartMonthLabel" class="label" style="font-size:14px;font-weight:800;margin:4px 0 12px">統計月份：--</div><div class="donutbox"><div class="donut" id="donut"><div class="donutcenter"><b id="chartTotal">$0</b><span class="label">本月支出</span></div></div></div><div class="legend" id="legend"></div></section><section class="card"><details class="collapsible-section"><summary><h2>📈 年度統計 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content"><div class="grid3"><div class="stat"><div class="label">年度收入</div><div class="val income" id="yearIncome">$0</div></div><div class="stat"><div class="label">年度支出</div><div class="val expense" id="yearExpense">$0</div></div><div class="stat"><div class="label">年度淨額</div><div class="val net" id="yearNet">$0</div></div></div><div class="monthgrid" id="yearGrid" style="margin-top:10px"></div></div></details></section><section class="card"><h2>🔎 搜尋紀錄</h2><details class="search-list-collapse"><summary class="btn" style="list-style:none;cursor:pointer;margin-top:8px">展開／收合搜尋與整份紀錄清單</summary><div class="filters" style="margin-top:12px"><input id="search" placeholder="搜尋分類、備註或帳戶"/><select id="accountFilter"><option value="all">全部銀行帳戶</option></select><select id="typeFilter"><option value="all">全部</option><option value="income">收入</option><option value="expense">支出</option></select><select id="categoryFilter"><option value="all">全部分類</option></select><input id="monthFilter" type="month"/></div><button class="btn" id="clearSearch" style="margin-top:10px" type="button">清除搜尋</button><div id="records" style="margin-top:10px"></div></details></section><section class="card">
+<section class="card"><h2>🥧 分類圓餅圖</h2><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:4px 0 12px"><label for="chartMonthPicker" style="font-weight:800">切換統計月份</label><input id="chartMonthPicker" type="month" style="max-width:190px;flex:1" aria-label="選擇圓餅圖統計月份"><div id="chartMonthLabel" class="label" style="font-size:14px;font-weight:800">統計月份：--</div></div><div class="donutbox"><div class="donut" id="donut"><div class="donutcenter"><b id="chartTotal">$0</b><span class="label">本月支出</span></div></div></div><div class="legend" id="legend"></div></section><section class="card"><details class="collapsible-section"><summary><h2>📈 年度統計 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content"><div class="grid3"><div class="stat"><div class="label">年度收入</div><div class="val income" id="yearIncome">$0</div></div><div class="stat"><div class="label">年度支出</div><div class="val expense" id="yearExpense">$0</div></div><div class="stat"><div class="label">年度淨額</div><div class="val net" id="yearNet">$0</div></div></div><div class="monthgrid" id="yearGrid" style="margin-top:10px"></div></div></details></section><section class="card"><h2>🔎 搜尋紀錄</h2><details class="search-list-collapse"><summary class="btn" style="list-style:none;cursor:pointer;margin-top:8px">展開／收合搜尋與整份紀錄清單</summary><div class="filters" style="margin-top:12px"><input id="search" placeholder="搜尋分類、備註或帳戶"/><select id="accountFilter"><option value="all">全部銀行帳戶</option></select><select id="typeFilter"><option value="all">全部</option><option value="income">收入</option><option value="expense">支出</option></select><select id="categoryFilter"><option value="all">全部分類</option></select><input id="monthFilter" type="month"/></div><button class="btn" id="clearSearch" style="margin-top:10px" type="button">清除搜尋</button><div id="records" style="margin-top:10px"></div></details></section><section class="card">
 <h2>⚙️ 初始餘額</h2>
 <div class="form">
 <div><label>銀行帳戶</label><select id="initialAccount"></select></div>
@@ -621,6 +621,7 @@ function renderChart(){
   // 避免備份匯入或舊資料中的自訂分類被圓餅圖漏掉。
   var chartMonth=currentMonth||today().slice(0,7);
   $("chartMonthLabel").textContent="統計月份："+monthLabel(chartMonth);
+  var chartPicker=$("chartMonthPicker");if(chartPicker&&chartPicker.value!==chartMonth)chartPicker.value=chartMonth;
   var centerLabel=$("donut").querySelector(".donutcenter .label");
   if(centerLabel)centerLabel.textContent=monthLabel(chartMonth)+"支出";
   var rows=monthRows(chartMonth).filter(function(r){
@@ -975,6 +976,7 @@ function init(){
   $("next").addEventListener("click",function(){moveMonth(1);});
   $("now").addEventListener("click",function(){currentMonth=today().slice(0,7);render();});
   $("calendarMonthPicker").addEventListener("change",function(){if(/^\d{4}-\d{2}$/.test(this.value)){currentMonth=this.value;render();}});
+  $("chartMonthPicker").addEventListener("change",function(){if(/^\d{4}-\d{2}$/.test(this.value)){currentMonth=this.value;render();}});
   $("budgetMonth").value=currentMonth;
   $("budgetCategory").value=CATS[0];
   $("saveBudgetBtn").addEventListener("click",saveBudget);
