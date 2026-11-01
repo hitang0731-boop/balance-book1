@@ -120,7 +120,7 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 <div class="grid2" style="margin-top:12px"><button class="btn primary" id="saveBudgetBtn" type="button">＋ 儲存預算</button><button class="btn" id="notifyBtn" type="button">🔔 開啟通知提醒</button></div>
 </div></details><div id="budgetList" style="margin-top:10px"></div></section>
 <section class="card"><details class="collapsible-section"><summary><h2>🗓️ 月份總覽 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content"><div class="table"><table><thead><tr><th>月份</th><th>收入</th><th>支出</th><th>淨額</th><th>筆數</th></tr></thead><tbody id="monthTable"></tbody></table></div></div></details></section>
-<section class="card"><details class="collapsible-section"><summary><h2>📆 月曆 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content"><div class="calendarhead"><div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div></div><div class="calendar" id="calendar"></div><div id="calendarDayDetails" class="day-detail" aria-live="polite"><div class="empty">點選月曆上的日期，即可查看當日收支明細。</div></div></div></details></section>
+<section class="card"><details class="collapsible-section"><summary><h2>📆 月曆 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content"><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap"><label for="calendarMonthPicker" style="font-weight:800">選擇月份</label><input id="calendarMonthPicker" type="month" style="max-width:190px;flex:1" aria-label="直接選擇月曆月份"></div><div class="calendarhead"><div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div></div><div class="calendar" id="calendar"></div><div id="calendarDayDetails" class="day-detail" aria-live="polite"><div class="empty">點選月曆上的日期，即可查看當日收支明細。</div></div></div></details></section>
 <section class="card">
 <details class="collapsible-section"><summary><h2>📅 月份切換 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content">
 <div class="monthnav"><button class="btn" id="prev" type="button">‹</button><div class="monthtitle" id="monthTitle"></div><button class="btn" id="next" type="button">›</button></div>
@@ -668,13 +668,16 @@ function renderCategoryTable(){
   $("categoryTable").innerHTML=html||'<tr><td colspan="4" class="empty">本月尚無分類紀錄</td></tr>';
 }
 function renderCalendar(){
-  var p=currentMonth.split("-"),y=parseInt(p[0],10),m=parseInt(p[1],10);
-  var first=new Date(y,m-1,1),days=new Date(y,m,0).getDate(),html="";
-  for(var i=0;i<first.getDay();i++) html+="<div></div>";
+  var p=String(currentMonth||today().slice(0,7)).split("-"),y=Number(p[0]),m=Number(p[1]);
+  if(!Number.isInteger(y)||!Number.isInteger(m)||m<1||m>12){y=Number(today().slice(0,4));m=Number(today().slice(5,7));}
+  var firstWeekday=new Date(Date.UTC(y,m-1,1)).getUTCDay();
+  var days=new Date(Date.UTC(y,m,0)).getUTCDate(),html="";
+  var picker=$("calendarMonthPicker");if(picker&&picker.value!==y+"-"+pad(m))picker.value=y+"-"+pad(m);
+  for(var i=0;i<firstWeekday;i++) html+="<div aria-hidden=\"true\"></div>";
   for(var day=1;day<=days;day++){
-    var ds=y+"-"+pad(m)+"-"+pad(day),r=data.records.filter(function(x){return x.date===ds;});
+    var ds=y+"-"+pad(m)+"-"+pad(day),r=data.records.filter(function(x){return String(x.date||"").slice(0,10)===ds;});
     var inc=sum(r,"income"),exp=sum(r,"expense");
-    html+='<button type="button" class="day '+(ds===today()?"today":"")+'" data-date="'+ds+'"><div class="daynum">'+day+'</div>'+(inc?'<div class="dm income">↑'+money(inc)+'</div>':"")+(exp?'<div class="dm expense">↓'+money(exp)+'</div>':"")+"</button>";
+    html+='<button type="button" class="day '+(ds===today()?"today":"")+'" data-date="'+ds+'" aria-label="'+ds+'，收入 '+inc+'，支出 '+exp+'"><div class="daynum">'+day+'</div>'+(inc?'<div class="dm income">↑'+money(inc)+'</div>':"")+(exp?'<div class="dm expense">↓'+money(exp)+'</div>':"")+"</button>";
   }
   $("calendar").innerHTML=html;
   var btns=$("calendar").querySelectorAll("[data-date]");
@@ -958,6 +961,7 @@ function init(){
   $("prev").addEventListener("click",function(){moveMonth(-1);});
   $("next").addEventListener("click",function(){moveMonth(1);});
   $("now").addEventListener("click",function(){currentMonth=today().slice(0,7);render();});
+  $("calendarMonthPicker").addEventListener("change",function(){if(/^\d{4}-\d{2}$/.test(this.value)){currentMonth=this.value;render();}});
   $("budgetMonth").value=currentMonth;
   $("budgetCategory").value=CATS[0];
   $("saveBudgetBtn").addEventListener("click",saveBudget);
