@@ -409,7 +409,7 @@ function fillAccounts(){
 function renderAccounts(){
   var html="";
   for(var i=0;i<data.accounts.length;i++){
-    var a=data.accounts[i],rows=accountRows(a.id),inc=sum(rows,"income"),exp=sum(rows,"expense");
+    var a=data.accounts[i],rows=accountRows(a.id),inc=sum(rows,"income"),exp=sum(rows,"expense")+data.cardPayments.filter(function(p){return String(p.accountId)===String(a.id);}).reduce(function(t,p){return t+(Number(p.amount)||0);},0);
     html+='<div class="account-card" style="display:flex;flex-direction:column;gap:9px">'
       +'<button type="button" data-account-open="'+escapeHtml(a.id)+'" style="border:0;background:transparent;padding:0;text-align:left;color:inherit;width:100%;cursor:pointer">'
       +'<div class="account-name">🏦 '+escapeHtml(a.name)+'</div>'
@@ -465,15 +465,17 @@ function renderAccountDetail(){
   var a=accountById(currentAccountId);
   var rows=accountRows(currentAccountId).slice().sort(function(x,y){return y.date.localeCompare(x.date)||String(y.id).localeCompare(String(x.id));});
   var transfers=transferRows(currentAccountId).slice().sort(function(x,y){return y.date.localeCompare(x.date)||String(y.id).localeCompare(String(x.id));});
+  var cardPays=data.cardPayments.filter(function(p){return String(p.accountId)===String(currentAccountId);}).slice().sort(function(x,y){return y.date.localeCompare(x.date)||String(y.id).localeCompare(String(x.id));});
   $("detailTitle").textContent="🏦 "+a.name+"｜帳戶明細";
   $("detailBalance").textContent=money(accountBalance(currentAccountId));
   $("detailIncome").textContent=money(sum(rows,"income"));
-  $("detailExpense").textContent=money(sum(rows,"expense"));
+  $("detailExpense").textContent=money(sum(rows,"expense")+cardPays.reduce(function(t,p){return t+(Number(p.amount)||0);},0));
   $("detailInitial").textContent=money(a.initialBalance);
-  $("detailCount").textContent=String(rows.length+transfers.length);
+  $("detailCount").textContent=String(rows.length+transfers.length+cardPays.length);
   var events=[];
   for(var i=0;i<rows.length;i++) events.push({kind:"record",date:rows[i].date,id:rows[i].id,item:rows[i]});
   for(var j=0;j<transfers.length;j++) events.push({kind:"transfer",date:transfers[j].date,id:transfers[j].id,item:transfers[j]});
+  for(var cp=0;cp<cardPays.length;cp++) events.push({kind:"cardPayment",date:cardPays[cp].date,id:cardPays[cp].id,item:cardPays[cp]});
   events.sort(function(x,y){return y.date.localeCompare(x.date)||String(y.id).localeCompare(String(x.id));});
   var html="";
   for(var z=0;z<events.length;z++){
@@ -483,6 +485,11 @@ function renderAccountDetail(){
       html+='<div class="record"><div class="rtop"><div><div class="rtitle">'+(r.type==="income"?"💵":"💸")+' '+escapeHtml(r.category)+'</div><div class="rmeta">📅 '+escapeHtml(r.date)+'</div></div><div class="ramount '+r.type+'">'+(r.type==="income"?"+":"-")+money(r.amount)+'</div></div>';
       if(r.note)html+='<div class="rnote">📝 '+escapeHtml(r.note)+'</div>';
       html+='<div class="actions"><button type="button" class="btn" data-detail-edit="'+escapeHtml(r.id)+'">✏️ 編輯</button><button type="button" class="btn danger" data-detail-delete="'+escapeHtml(r.id)+'">🗑️ 刪除</button></div></div>';
+    }else if(ev.kind==="cardPayment"){
+      var pay=ev.item,paidCard=cardById(pay.cardId);
+      html+='<div class="record"><div class="rtop"><div><div class="rtitle">💳 信用卡卡費扣繳｜'+escapeHtml(paidCard?paidCard.name:"已刪除的信用卡")+'</div><div class="rmeta">📅 '+escapeHtml(pay.date)+'</div></div><div class="ramount expense">-'+money(pay.amount)+'</div></div>';
+      if(pay.note)html+='<div class="rnote">📝 '+escapeHtml(pay.note)+'</div>';
+      html+='<div class="actions"><button type="button" class="btn danger" data-detail-card-payment-delete="'+escapeHtml(pay.id)+'">🗑️ 刪除繳款</button></div></div>';
     }else{
       var t=ev.item, incoming=String(t.toAccountId)===String(currentAccountId);
       var other=accountName(incoming?t.fromAccountId:t.toAccountId);
@@ -500,6 +507,8 @@ function renderAccountDetail(){
   for(var m=0;m<tes.length;m++)tes[m].addEventListener("click",function(){openTransferEdit(this.getAttribute("data-transfer-edit"));});
   var tds=$("detailRecords").querySelectorAll("[data-transfer-delete]");
   for(var n=0;n<tds.length;n++)tds[n].addEventListener("click",function(){deleteTransfer(this.getAttribute("data-transfer-delete"));});
+  var cps=$("detailRecords").querySelectorAll("[data-detail-card-payment-delete]");
+  for(var w=0;w<cps.length;w++)cps[w].addEventListener("click",function(){deleteCardPayment(this.getAttribute("data-detail-card-payment-delete"));});
 }
 
 function cardById(id){for(var i=0;i<data.creditCards.length;i++)if(String(data.creditCards[i].id)===String(id))return data.creditCards[i];return null;}
