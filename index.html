@@ -617,19 +617,28 @@ function renderMonth(){
   $("mi").textContent=money(i);$("me").textContent=money(e);$("mn").textContent=money(i-e);
 }
 function renderChart(){
-  var rows=monthRows(currentMonth), total=sum(rows,"expense"), values=[];
-  for(var i=0;i<CATS.length;i++){
-    var v=sum(rows.filter(function(r){return r.category===CATS[i];}),"expense");
-    if(v>0) values.push({name:CATS[i],value:v});
+  // 以目前選取月份的所有支出紀錄動態彙總，不限於預設 CATS，
+  // 避免備份匯入或舊資料中的自訂分類被圓餅圖漏掉。
+  var rows=monthRows(currentMonth).filter(function(r){
+    return r.type==="expense" && (Number(r.amount)||0)>0;
+  });
+  var grouped={};
+  for(var i=0;i<rows.length;i++){
+    var name=String(rows[i].category||"未分類").trim()||"未分類";
+    grouped[name]=(grouped[name]||0)+(Number(rows[i].amount)||0);
   }
+  var values=Object.keys(grouped).map(function(name){
+    return {name:name,value:grouped[name]};
+  }).filter(function(item){return item.value>0;});
   values.sort(function(a,b){return b.value-a.value;});
+  var total=values.reduce(function(acc,item){return acc+item.value;},0);
   $("chartTotal").textContent=money(total);
   if(total<=0){
     $("donut").style.background="#e5e7eb";
-    $("legend").innerHTML='<div class="empty">本月尚無支出資料</div>';
+    $("legend").innerHTML='<div class="empty">'+escapeHtml(monthLabel(currentMonth))+' 尚無支出資料</div>';
     return;
   }
-  var start=0, parts=[];
+  var start=0,parts=[];
   for(var j=0;j<values.length;j++){
     var end=start+values[j].value/total*360;
     parts.push(COLORS[j%COLORS.length]+" "+start+"deg "+end+"deg");
