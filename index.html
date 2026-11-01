@@ -61,6 +61,33 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 <div class="sub">收入、支出、銀行帳戶與月份管理</div>
 
 
+<section class="card" id="accountDetail" style="display:none">
+<div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+<h2 id="detailTitle" style="margin:0">🏦 帳戶明細</h2>
+<button class="btn" id="closeAccountDetail" type="button">← 回到帳戶總覽</button>
+</div>
+<div class="grid3" style="margin-top:12px">
+<div class="stat"><div class="label">目前餘額</div><div class="val" id="detailBalance">$0</div></div>
+<div class="stat"><div class="label">總收入</div><div class="val income" id="detailIncome">$0</div></div>
+<div class="stat"><div class="label">總支出</div><div class="val expense" id="detailExpense">$0</div></div>
+</div>
+<div class="grid2" style="margin-top:10px"><div class="stat"><div class="label">初始餘額</div><div class="val" id="detailInitial">$0</div></div><div class="stat"><div class="label">交易筆數</div><div class="val" id="detailCount">0</div></div></div>
+<h3 style="margin:18px 0 8px">📋 此帳戶交易紀錄</h3>
+<div id="detailRecords"></div>
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <section class="card">
 <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div class="label">目前總餘額</div><button class="btn" id="toggleTotalVisibility" type="button" aria-pressed="true">👁️ 顯示金額</button></div><div class="big" id="total" data-real-value="$0">$0</div>
@@ -92,20 +119,6 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 </div>
 <div class="grid2" style="margin-top:12px"><button class="btn primary" id="saveBudgetBtn" type="button">＋ 儲存預算</button><button class="btn" id="notifyBtn" type="button">🔔 開啟通知提醒</button></div>
 </div></details><div id="budgetList" style="margin-top:10px"></div></section>
-<div class="sidebar-launch"><details class="side-drawer"><summary aria-label="開啟側邊功能選單">☰ 更多功能</summary><div class="side-drawer-panel"><div class="side-drawer-heading">其他功能</div><section class="card" id="accountDetail" style="display:none">
-<div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-<h2 id="detailTitle" style="margin:0">🏦 帳戶明細</h2>
-<button class="btn" id="closeAccountDetail" type="button">← 回到帳戶總覽</button>
-</div>
-<div class="grid3" style="margin-top:12px">
-<div class="stat"><div class="label">目前餘額</div><div class="val" id="detailBalance">$0</div></div>
-<div class="stat"><div class="label">總收入</div><div class="val income" id="detailIncome">$0</div></div>
-<div class="stat"><div class="label">總支出</div><div class="val expense" id="detailExpense">$0</div></div>
-</div>
-<div class="grid2" style="margin-top:10px"><div class="stat"><div class="label">初始餘額</div><div class="val" id="detailInitial">$0</div></div><div class="stat"><div class="label">交易筆數</div><div class="val" id="detailCount">0</div></div></div>
-<h3 style="margin:18px 0 8px">📋 此帳戶交易紀錄</h3>
-<div id="detailRecords"></div>
-</section>
 <section class="card"><details class="collapsible-section"><summary><h2>🗓️ 月份總覽 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content"><div class="table"><table><thead><tr><th>月份</th><th>收入</th><th>支出</th><th>淨額</th><th>筆數</th></tr></thead><tbody id="monthTable"></tbody></table></div></div></details></section>
 <section class="card"><details class="collapsible-section"><summary><h2>📆 月曆 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content"><div class="calendarhead"><div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div></div><div class="calendar" id="calendar"></div><div id="calendarDayDetails" class="day-detail" aria-live="polite"><div class="empty">點選月曆上的日期，即可查看當日收支明細。</div></div></div></details></section>
 <section class="card">
@@ -147,10 +160,26 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 <h3 style="margin:18px 0 8px">＋ 新增信用卡</h3><div class="form"><div><label>信用卡名稱</label><input id="newCardName" placeholder="例如：國泰 Cube 卡"/></div><div><label>信用額度</label><input id="newCardLimit" type="number" min="0" step="1" inputmode="decimal" placeholder="例如 100000"/></div><div><label>結帳日（每月）</label><input id="newCardStatementDay" type="number" min="1" max="31" value="20"/></div><div><label>繳款日（每月）</label><input id="newCardDueDay" type="number" min="1" max="31" value="10"/></div></div><button class="btn primary full" id="addCreditCardBtn" style="margin-top:10px" type="button">＋ 新增信用卡</button>
 <h3 style="margin:20px 0 8px">💸 繳信用卡費</h3><div class="label" style="margin-bottom:10px">繳款會扣除選定的銀行帳戶餘額，並減少信用卡欠款，不會重複計入支出。</div><div class="form"><div><label>信用卡</label><select id="payCardSelect"></select></div><div><label>扣款銀行帳戶</label><select id="payBankSelect"></select></div><div><label>繳款日期</label><input id="cardPaymentDate" type="date"/></div><div><label>繳款金額</label><input id="cardPaymentAmount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="例如 5000"/></div><div style="grid-column:1/-1"><label>備註</label><input id="cardPaymentNote" placeholder="例如 10 月信用卡帳單"/></div></div><button class="btn primary full" id="payCreditCardBtn" style="margin-top:10px" type="button">確認繳款</button><div id="cardPaymentList" style="margin-top:12px"></div>
 </div></details></section>
-<section class="card"><h2>🥧 分類圓餅圖</h2><div class="donutbox"><div class="donut" id="donut"><div class="donutcenter"><b id="chartTotal">$0</b><span class="label">本月支出</span></div></div></div><div class="legend" id="legend"></div></section>
-<section class="card"><details class="collapsible-section"><summary><h2>📈 年度統計 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content"><div class="grid3"><div class="stat"><div class="label">年度收入</div><div class="val income" id="yearIncome">$0</div></div><div class="stat"><div class="label">年度支出</div><div class="val expense" id="yearExpense">$0</div></div><div class="stat"><div class="label">年度淨額</div><div class="val net" id="yearNet">$0</div></div></div><div class="monthgrid" id="yearGrid" style="margin-top:10px"></div></div></details></section>
-<section class="card"><h2>🔎 搜尋紀錄</h2><details class="search-list-collapse"><summary class="btn" style="list-style:none;cursor:pointer;margin-top:8px">展開／收合搜尋與整份紀錄清單</summary><div class="filters" style="margin-top:12px"><input id="search" placeholder="搜尋分類、備註或帳戶"/><select id="accountFilter"><option value="all">全部銀行帳戶</option></select><select id="typeFilter"><option value="all">全部</option><option value="income">收入</option><option value="expense">支出</option></select><select id="categoryFilter"><option value="all">全部分類</option></select><input id="monthFilter" type="month"/></div><button class="btn" id="clearSearch" style="margin-top:10px" type="button">清除搜尋</button><div id="records" style="margin-top:10px"></div></details></section>
-<section class="card">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<section class="card"><h2>🥧 分類圓餅圖</h2><div class="donutbox"><div class="donut" id="donut"><div class="donutcenter"><b id="chartTotal">$0</b><span class="label">本月支出</span></div></div></div><div class="legend" id="legend"></div></section><section class="card"><details class="collapsible-section"><summary><h2>📈 年度統計 <span class="collapse-hint">（點擊收合／展開）</span></h2></summary><div class="collapsible-content"><div class="grid3"><div class="stat"><div class="label">年度收入</div><div class="val income" id="yearIncome">$0</div></div><div class="stat"><div class="label">年度支出</div><div class="val expense" id="yearExpense">$0</div></div><div class="stat"><div class="label">年度淨額</div><div class="val net" id="yearNet">$0</div></div></div><div class="monthgrid" id="yearGrid" style="margin-top:10px"></div></div></details></section><section class="card"><h2>🔎 搜尋紀錄</h2><details class="search-list-collapse"><summary class="btn" style="list-style:none;cursor:pointer;margin-top:8px">展開／收合搜尋與整份紀錄清單</summary><div class="filters" style="margin-top:12px"><input id="search" placeholder="搜尋分類、備註或帳戶"/><select id="accountFilter"><option value="all">全部銀行帳戶</option></select><select id="typeFilter"><option value="all">全部</option><option value="income">收入</option><option value="expense">支出</option></select><select id="categoryFilter"><option value="all">全部分類</option></select><input id="monthFilter" type="month"/></div><button class="btn" id="clearSearch" style="margin-top:10px" type="button">清除搜尋</button><div id="records" style="margin-top:10px"></div></details></section><section class="card">
 <h2>⚙️ 初始餘額</h2>
 <div class="form">
 <div><label>銀行帳戶</label><select id="initialAccount"></select></div>
@@ -165,8 +194,7 @@ label{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}input,s
 <div class="grid2"><button class="btn" id="exportBtn" type="button">匯出 JSON</button><button class="btn" id="backupBtn" type="button">完整備份</button></div>
 <label class="btn" style="display:block;text-align:center;margin-top:10px;color:#2563eb">📥 還原備份<input accept=".json,application/json" id="restoreInput" style="display:none" type="file"/></label>
 <button class="btn danger full" id="clearAllBtn" style="margin-top:10px" type="button">清除全部紀錄</button>
-</section></div></details></div>
-</div>
+</section></div>
 <div class="modalbg" id="transferModal"><div class="modal">
 <div class="modalhead"><h2>✏️ 編輯轉帳</h2><button class="close" id="closeTransferModal" type="button">×</button></div>
 <div class="form">
