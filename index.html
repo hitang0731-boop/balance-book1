@@ -410,29 +410,37 @@ function renderAccounts(){
   var html="";
   for(var i=0;i<data.accounts.length;i++){
     var a=data.accounts[i],rows=accountRows(a.id),inc=sum(rows,"income"),exp=sum(rows,"expense");
-    html+='<button type="button" class="account-card" data-account-open="'+escapeHtml(a.id)+'">'
+    html+='<div class="account-card" style="display:flex;flex-direction:column;gap:9px">'
+      +'<button type="button" data-account-open="'+escapeHtml(a.id)+'" style="border:0;background:transparent;padding:0;text-align:left;color:inherit;width:100%;cursor:pointer">'
       +'<div class="account-name">🏦 '+escapeHtml(a.name)+'</div>'
       +'<div class="account-balance">'+money(accountBalance(a.id))+'</div>'
-      +'<div class="account-mini">收入 '+money(inc)+'　支出 '+money(exp)+'</div>'
-      +'</button>';
+      +'<div class="account-mini">收入 '+money(inc)+'　支出 '+money(exp)+'</div></button>'
+      +'<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">'
+      +'<input type="text" aria-label="修改 '+escapeHtml(a.name)+' 帳戶名稱" data-rename-account="'+escapeHtml(a.id)+'" value="'+escapeHtml(a.name)+'" maxlength="40" style="flex:1;min-width:100px;padding:9px;border:1px solid var(--line);border-radius:10px">'
+      +'<button type="button" class="btn" data-save-account-name="'+escapeHtml(a.id)+'">儲存</button>'
+      +'<button type="button" class="btn" data-account-move="up" data-account-id="'+escapeHtml(a.id)+'" '+(i===0?'disabled':'')+' aria-label="'+escapeHtml(a.name)+'往前移">↑</button>'
+      +'<button type="button" class="btn" data-account-move="down" data-account-id="'+escapeHtml(a.id)+'" '+(i===data.accounts.length-1?'disabled':'')+' aria-label="'+escapeHtml(a.name)+'往後移">↓</button>'
+      +'</div></div>';
   }
   $("accountSummary").innerHTML=html;
-  var bs=$("accountSummary").querySelectorAll("[data-account-open]");
-  for(var j=0;j<bs.length;j++) bs[j].addEventListener("click",function(){openAccountDetail(this.getAttribute("data-account-open"));});
-  var manage="";
-  for(var k=0;k<data.accounts.length;k++){
-    var acc=data.accounts[k];
-    manage+='<div class="form" style="margin:8px 0;padding:10px;border:1px solid var(--line,#ddd);border-radius:12px"><div><label>修改帳戶名稱</label><input type="text" id="renameAccount_'+escapeHtml(acc.id)+'" value="'+escapeHtml(acc.name)+'" maxlength="40"></div><div style="display:flex;align-items:end"><button type="button" class="btn" data-save-account-name="'+escapeHtml(acc.id)+'">儲存名稱</button></div></div>';
-  }
-  $("accountManage").innerHTML=manage;
-  var renameBtns=$("accountManage").querySelectorAll("[data-save-account-name]");
+  var openBtns=$("accountSummary").querySelectorAll("[data-account-open]");
+  for(var j=0;j<openBtns.length;j++) openBtns[j].addEventListener("click",function(){openAccountDetail(this.getAttribute("data-account-open"));});
+  var renameBtns=$("accountSummary").querySelectorAll("[data-save-account-name]");
   for(var r=0;r<renameBtns.length;r++) renameBtns[r].addEventListener("click",function(){
-    var id=this.getAttribute("data-save-account-name"),field=$("renameAccount_"+id),name=field?field.value.trim():"",account=accountById(id);
+    var id=this.getAttribute("data-save-account-name"),field=$("accountSummary").querySelector('[data-rename-account="'+id+'"]'),name=field?field.value.trim():"",account=accountById(id);
     if(!account)return;
     if(!name){showToast("帳戶名稱不可空白");return;}
     if(data.accounts.some(function(x){return x.id!==id&&x.name===name;})){showToast("這個帳戶名稱已存在");return;}
     account.name=name;safeSave();fillAccounts();render();showToast("帳戶名稱已更新");
   });
+  var moveBtns=$("accountSummary").querySelectorAll("[data-account-move]");
+  for(var m=0;m<moveBtns.length;m++) moveBtns[m].addEventListener("click",function(){
+    var id=this.getAttribute("data-account-id"),dir=this.getAttribute("data-account-move"),idx=data.accounts.findIndex(function(x){return x.id===id;}),to=idx+(dir==="up"?-1:1);
+    if(idx<0||to<0||to>=data.accounts.length)return;
+    var tmp=data.accounts[idx];data.accounts[idx]=data.accounts[to];data.accounts[to]=tmp;
+    safeSave();renderAccounts();
+  });
+  if($("accountManage"))$("accountManage").innerHTML="";
 }
 function addAccount(){
   var name=$("newAccountName").value.trim();
